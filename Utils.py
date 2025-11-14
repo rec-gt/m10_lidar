@@ -47,98 +47,6 @@ class OSLinux:
 #     ser_m10 = None
 #     ser_to_mcu = None
 #
-#     plot_app = None
-#     plot_win = None
-#     plot_plt = None
-#     scatter = None
-#     relay = None
-#     prevTime = time.time()
-#
-#     state = 0b00000000
-#
-#     distance_cloud = {
-#         8: [],
-#         23: [],
-#         38: [],
-#         53: [],
-#         68: [],
-#         83: [],
-#         98: [],
-#         113: [],
-#         128: [],
-#         143: [],
-#         158: [],
-#         173: [],
-#         188: [],
-#         203: [],
-#         218: [],
-#         233: [],
-#         248: [],
-#         263: [],
-#         278: [],
-#         293: [],
-#         308: [],
-#         323: [],
-#         338: [],
-#         353: [],
-#     }
-#
-#     sin_values = []
-#     cos_values = []
-#
-#     counter = 0
-#     curr_err = 0
-
-#
-#     def conn(self):
-#         if self.ser_m10 and self.ser_m10.is_open:
-#             self.ser_m10.close()
-#             self.ser_m10 = None
-#
-#         if self.ser_to_mcu and self.ser_to_mcu.is_open:
-#             self.ser_to_mcu.close()
-#             self.ser_to_mcu = None
-#
-#         self.ser_m10 = self.curr_os.ser_m10
-#         self.ser_to_mcu = self.curr_os.ser_to_mcu
-#
-#     def parse_data(self, data):
-#         start_angle = (data[0] * 256 + data[1]) / 100.0
-#         speed = data[2] * 256 + data[3]
-#         distances = []
-#
-#         for x in range(4, 87, 2):
-#             distance = data[x] * 256 + data[x + 1]
-#             if distance != 0 and distance != 65535:
-#                 distances.append(distance)
-#             else:
-#                 distances.append(None)
-#
-#         return speed, start_angle, distances
-#
-#     def get_angle_distance_pairs_from_cloud(self):
-#         res = []
-#         for angle, distances in self.distance_cloud.items():
-#             delta_angle = 0
-#             for distance in distances:
-#                 if distance is not None:
-#                     res.append([angle + delta_angle, distance])
-#                 delta_angle += 360 / 1008
-#         return res
-#
-#     def radian_distance_to_coordinate(self, angle_distance_pairs):
-#         sin_values = []
-#         cos_values = []
-#
-#         for (angle, distance) in angle_distance_pairs:
-#             radian = angle * math.pi / 180
-#             sin_theta = math.sin(radian)
-#             cos_theta = math.cos(radian)
-#             sin_values.append(distance * sin_theta)
-#             cos_values.append(distance * cos_theta)
-#
-#         return sin_values, cos_values
-#
 #     def inbound_detect(self):
 #         length = len(self.sin_values)
 #         for i in range(length):
@@ -178,42 +86,6 @@ class OSLinux:
 #             string += "1" if self.inbound_detect() else "0"
 #             self.ser_to_mcu.write(bytes(b'AT+STATUS=' + bytes(string, 'utf-8') + b'\r\n'))
 #
-#     def loop(self):
-#         while True:
-#             self.handle_comm_mcu()
-#
-#             if self.curr_err == 1:
-#                 try:
-#                     self.conn()
-#                     self.curr_err = 0
-#                 except Exception as e:
-#                     print(e)
-#                     continue
-#
-#             if self.curr_err == 0:
-#                 try:
-#                     if self.ser_m10.in_waiting > 0:
-#                         data = self.ser_m10.read(1)
-#                         if data[0] == 0xA5:
-#                             data = self.ser_m10.read(1)
-#                             if data[0] == 0x5A:
-#                                 data = self.ser_m10.read(88)
-#                                 speed, start_angle, distances = self.parse_data(data)
-#                                 self.distance_cloud[start_angle] = distances
-#                                 angle_distance_pairs = self.get_angle_distance_pairs_from_cloud()
-#                                 self.sin_values, self.cos_values = self.radian_distance_to_coordinate(
-#                                     angle_distance_pairs)
-#
-#                                 self.counter += 1
-#                                 if self.counter == 36:
-#                                     self.counter = 0
-#                                     self.plot_circle(self.sin_values, self.cos_values)
-#
-#                 except Exception as e:
-#                     print(e)
-#                     self.curr_err = 1
-#                     continue
-#
 #     def print_data(self, speed, start_angle, distances, last_angle):
 #         if last_angle - start_angle > 100:
 #             print("*******************************")
@@ -232,7 +104,6 @@ class OSLinux:
 # service.init_relay()
 # service.init_plot()
 # service.conn()
-# service.loop()
 
 
 curr_os = OSWindows()

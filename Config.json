@@ -15,8 +15,8 @@
     "x": 0,
     "y": 0
   },
-  "CALIBRATION_POINT": [
-    0,
-    0
-  ]
+  "CALIBRATION_POINT": {
+    "x": 0,
+    "y": 0
+  }
 }

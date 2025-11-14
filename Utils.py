@@ -305,7 +305,7 @@ class PlotLidar:
         try:
             if CONFIG["PLOTTING"]:
                 self.counter += 1
-                if self.counter >= 100:
+                if self.counter >= 500:
                     self.scatter_dynamic.setData(x=xs, y=ys)
                     self.plot_app.processEvents()
                     time.sleep(0.05)

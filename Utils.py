@@ -141,6 +141,7 @@ class ConfigSystem:
 
 class Debouncer:
     prev_time = time.time()
+    counter = 0
 
     def auto_timeout(self, timeout, callback):
         curr_time = time.time()
@@ -148,19 +149,11 @@ class Debouncer:
             callback()
             self.prev_time = curr_time
 
-
-class Counter:
-    cnt = 0
-    max = 0
-
-    def __init__(self, max):
-        self.max = max
-
-    def auto_counter(self, callback):
-        self.cnt += 1
-        if self.cnt >= self.max:
+    def auto_counter(self, max_count, callback):
+        self.counter += 1
+        if self.counter >= max_count:
             callback()
-            self.cnt = 0
+            self.counter = 0
 
 
 class M10Lidar:

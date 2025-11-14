@@ -1,9 +1,9 @@
-from Utils import M10Lidar, PlotLidar, ConfigSystem, Counter
+from Utils import M10Lidar, PlotLidar, ConfigSystem, Debouncer
 
 configSystem = ConfigSystem()
 m10Lidar = M10Lidar()
 plotLidar = PlotLidar()
-counter = Counter(100)
+counter = Debouncer()
 
 configSystem.read()
 m10Lidar.connect()
@@ -18,4 +18,4 @@ def cb():
 
 while True:
     m10Lidar.listen()
-    counter.auto_counter(cb)
+    counter.auto_counter(100, cb)

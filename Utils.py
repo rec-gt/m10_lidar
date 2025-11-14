@@ -325,13 +325,3 @@ class PlotLidar:
         y = calibration_point[1]
         if CONFIG["PLOTTING"]:
             self.scatter_calibrate.setData(x=[x], y=[y])
-
-# m10Lidar = M10Lidar()
-# plotLidar = PlotLidar()
-#
-# m10Lidar.connect()
-# plotLidar.init()
-#
-# while True:
-#     m10Lidar.listen()
-#     plotLidar.update_cloud_points(m10Lidar.xs, m10Lidar.ys)

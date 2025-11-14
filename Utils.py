@@ -1,3 +1,4 @@
+import json
 import math
 import os
 import time
@@ -246,6 +247,25 @@ class Utils:
             xs.append(point[0])
             ys.append(point[1])
         return xs, ys
+
+
+class ConfigSystem:
+    boundary_points = (())
+    calibration_point = ()
+
+    def read(self):
+        with open("Config.json", 'r') as json_file:
+            config = json.load(json_file)
+
+        self.boundary_points = (
+            (config["TOP_LEFT_POINT"]["x"], config["TOP_LEFT_POINT"]["y"]),
+            (config["TOP_RIGHT_POINT"]["x"], config["TOP_RIGHT_POINT"]["y"]),
+            (config["BOTTOM_RIGHT_POINT"]["x"], config["BOTTOM_RIGHT_POINT"]["y"]),
+            (config["BOTTOM_LEFT_POINT"]["x"], config["BOTTOM_LEFT_POINT"]["y"]),
+            (config["TOP_LEFT_POINT"]["x"], config["TOP_LEFT_POINT"]["y"]),
+        )
+
+        self.calibration_point = (config["CALIBRATION_POINT"]["x"], config["CALIBRATION_POINT"]["y"])
 
 
 class Debouncer:

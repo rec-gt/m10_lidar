@@ -1,27 +1,20 @@
 import json
 
-from Utils import M10Lidar, PlotLidar
+from Utils import M10Lidar, PlotLidar, ConfigSystem
 
 with open("Config.json", 'r') as json_file:
     config = json.load(json_file)
 
-boundary_points = (
-    (config["TOP_LEFT_POINT"]["x"], config["TOP_LEFT_POINT"]["y"]),
-    (config["TOP_RIGHT_POINT"]["x"], config["TOP_RIGHT_POINT"]["y"]),
-    (config["BOTTOM_RIGHT_POINT"]["x"], config["BOTTOM_RIGHT_POINT"]["y"]),
-    (config["BOTTOM_LEFT_POINT"]["x"], config["BOTTOM_LEFT_POINT"]["y"]),
-    (config["TOP_LEFT_POINT"]["x"], config["TOP_LEFT_POINT"]["y"]),
-)
-
-calibration_point = (config["CALIBRATION_POINT"]["x"], config["CALIBRATION_POINT"]["y"])
-
+configSystem = ConfigSystem()
 m10Lidar = M10Lidar()
 plotLidar = PlotLidar()
+
+configSystem.read()
 m10Lidar.connect()
 plotLidar.init()
 
 while True:
     m10Lidar.listen()
     plotLidar.update_cloud_points(m10Lidar.xs, m10Lidar.ys)
-    plotLidar.plot_boundary(boundary_points)
-    plotLidar.plot_calibration_point(calibration_point)
+    plotLidar.plot_boundary(configSystem.boundary_points)
+    plotLidar.plot_calibration_point(configSystem.calibration_point)

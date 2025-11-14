@@ -31,13 +31,13 @@ CONFIG = {
 class OSWindows:
     plot_app = QApplication([]) if CONFIG["PLOTTING"] else None
     ser_m10 = serial.Serial("COM25", 460800, timeout=1)
-    ser_to_mcu = serial.Serial("COM22", 9600, timeout=1)
+    ser_mcu = serial.Serial("COM22", 9600, timeout=1)
 
 
 class OSLinux:
     plot_app = pg.mkQApp("") if CONFIG["PLOTTING"] else None
     ser_m10 = serial.Serial("/dev/ttyACM0", 460800, timeout=1) if CONFIG["OS"] == OSConfig.LINUX.name else None
-    ser_to_mcu = serial.Serial("/dev/ttyS0", 9600, timeout=1) if CONFIG["OS"] == OSConfig.LINUX.name else None
+    ser_mcu = serial.Serial("/dev/ttyS0", 9600, timeout=1) if CONFIG["OS"] == OSConfig.LINUX.name else None
 
 
 #
@@ -45,7 +45,7 @@ class OSLinux:
 #     curr_os = OSWindows()
 #
 #     ser_m10 = None
-#     ser_to_mcu = None
+#     ser_mcu = None
 #
 #     def inbound_detect(self):
 #         length = len(self.sin_values)
@@ -84,7 +84,7 @@ class OSLinux:
 #             self.prevTime = currTime
 #
 #             string += "1" if self.inbound_detect() else "0"
-#             self.ser_to_mcu.write(bytes(b'AT+STATUS=' + bytes(string, 'utf-8') + b'\r\n'))
+#             self.ser_mcu.write(bytes(b'AT+STATUS=' + bytes(string, 'utf-8') + b'\r\n'))
 #
 #     def print_data(self, speed, start_angle, distances, last_angle):
 #         if last_angle - start_angle > 100:
@@ -147,6 +147,20 @@ class Debouncer:
         if curr_time - self.prev_time >= timeout:
             callback()
             self.prev_time = curr_time
+
+
+class Counter:
+    cnt = 0
+    max = 0
+
+    def __init__(self, max):
+        self.max = max
+
+    def auto_counter(self, callback):
+        self.cnt += 1
+        if self.cnt >= self.max:
+            callback()
+            self.cnt = 0
 
 
 class M10Lidar:
@@ -316,3 +330,23 @@ class PlotLidar:
         y = calibration_point[1]
         if CONFIG["PLOTTING"]:
             self.scatter_calibrate.setData(x=[x], y=[y])
+
+
+class RS485Client:
+    ser_mcu = None
+
+    def connect(self):
+        if self.ser_mcu and self.ser_mcu.is_open:
+            self.ser_mcu.close()
+            self.ser_mcu = None
+
+        if self.ser_mcu:
+            self.ser_mcu.close()
+            self.ser_mcu = None
+
+        self.ser_mcu = curr_os.ser_mcu
+        if not self.ser_mcu.is_open:
+            self.ser_mcu.open()
+
+    def send(self):
+        self.ser_mcu.write(bytes(b'AT+STATUS=' + bytes("01000000", 'utf-8') + b'\r\n'))

@@ -3,6 +3,7 @@ from Utils import ConfigSystem, M10Lidar, PlotLidar, Utils
 
 class DetectSystem:
     counter = 0
+    is_detected = False
 
     @staticmethod
     def __is_inside_boundary(point, boundary):

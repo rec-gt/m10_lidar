@@ -1,9 +1,4 @@
-import json
-
 from Utils import M10Lidar, PlotLidar, ConfigSystem
-
-with open("Config.json", 'r') as json_file:
-    config = json.load(json_file)
 
 configSystem = ConfigSystem()
 m10Lidar = M10Lidar()

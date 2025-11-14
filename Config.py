@@ -13,7 +13,7 @@ boundary_points = (
     (config["TOP_LEFT_POINT"]["x"], config["TOP_LEFT_POINT"]["y"]),
 )
 
-calibration_point = (config["CALIBRATION_POINT"]["x"], config["CALIBRATION_POINT"]["y"]),
+calibration_point = (config["CALIBRATION_POINT"]["x"], config["CALIBRATION_POINT"]["y"])
 
 m10Lidar = M10Lidar()
 plotLidar = PlotLidar()
@@ -24,3 +24,4 @@ while True:
     m10Lidar.listen()
     plotLidar.update_cloud_points(m10Lidar.xs, m10Lidar.ys)
     plotLidar.plot_boundary(boundary_points)
+    plotLidar.plot_calibration_point(calibration_point)

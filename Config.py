@@ -1,12 +1,22 @@
+import json
+
 from Utils import M10Lidar, PlotLidar
 
+with open("Config.json", 'r') as json_file:
+    config = json.load(json_file)
+
+boundary_points = (
+    (config["TOP_LEFT_POINT"]["x"], config["TOP_LEFT_POINT"]["y"]),
+    (config["TOP_RIGHT_POINT"]["x"], config["TOP_RIGHT_POINT"]["y"]),
+    (config["BOTTOM_LEFT_POINT"]["x"], config["BOTTOM_LEFT_POINT"]["y"]),
+    (config["BOTTOM_RIGHT_POINT"]["x"], config["BOTTOM_RIGHT_POINT"]["y"])
+)
 
 m10Lidar = M10Lidar()
 plotLidar = PlotLidar()
 m10Lidar.connect()
 plotLidar.init()
 
-boundary_points = ([-6000, 1000], [0, 1000], [0, 0], [-6000, 0], [-6000, 1000])
 
 while True:
     m10Lidar.listen()

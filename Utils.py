@@ -281,8 +281,6 @@ class PlotLidar:
     scatter_center = None
     scatter_range = None
 
-    counter = 0
-
     def init(self):
         if CONFIG["PLOTTING"]:
             self.plot_app = curr_os.plot_app
@@ -302,17 +300,10 @@ class PlotLidar:
             # self.scatter_range.setData(x=xs, y=ys)
 
     def update_cloud_points(self, xs, ys):
-        try:
-            if CONFIG["PLOTTING"]:
-                self.counter += 1
-                if self.counter >= 500:
-                    self.scatter_dynamic.setData(x=xs, y=ys)
-                    self.plot_app.processEvents()
-                    time.sleep(0.05)
-
-                    self.counter = 0
-        except Exception as e:
-            print(e)
+        if CONFIG["PLOTTING"]:
+            self.scatter_dynamic.setData(x=xs, y=ys)
+            self.plot_app.processEvents()
+            time.sleep(0.05)
 
     def plot_boundary(self, boundary_points):
         if CONFIG["PLOTTING"]:

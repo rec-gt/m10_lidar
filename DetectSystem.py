@@ -2,6 +2,8 @@ from Utils import ConfigSystem, M10Lidar, PlotLidar, Utils
 
 
 class DetectSystem:
+    counter = 0
+
     @staticmethod
     def __is_inside_boundary(point, boundary):
         inside = False
@@ -37,8 +39,12 @@ plotLidar.init()
 
 while True:
     m10Lidar.listen()
-    plotLidar.update_cloud_points(m10Lidar.xs, m10Lidar.ys)
-    plotLidar.plot_boundary(configSystem.boundary_points)
-    plotLidar.plot_calibration_point(configSystem.calibration_point)
-    if detectSystem.is_one_detected(m10Lidar.points, configSystem.boundary_points):
-        print("detected")
+
+    detectSystem.counter += 1
+    if detectSystem.counter > 100:
+        detectSystem.counter = 0
+        plotLidar.update_cloud_points(m10Lidar.xs, m10Lidar.ys)
+        plotLidar.plot_boundary(configSystem.boundary_points)
+        plotLidar.plot_calibration_point(configSystem.calibration_point)
+        if detectSystem.is_one_detected(m10Lidar.points, configSystem.boundary_points):
+            print("detected")

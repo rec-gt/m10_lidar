@@ -325,6 +325,11 @@ class PlotLidar:
             self.scatter_calibrate.setData(x=[x], y=[y])
 
 
+class ModbusServer:
+    def listen(self):
+        pass
+
+
 class RS485Client:
     ser_mcu = None
 

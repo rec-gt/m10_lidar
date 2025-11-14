@@ -52,8 +52,7 @@ def cb():
 
 
 def cb2():
-    if detectSystem.is_detected:
-        rs485Client.send()
+    rs485Client.send()
 
 
 while True:

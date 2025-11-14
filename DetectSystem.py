@@ -1,8 +1,7 @@
-from Utils import ConfigSystem, M10Lidar, PlotLidar, Utils
+from Utils import ConfigSystem, M10Lidar, PlotLidar, Utils, Debouncer
 
 
 class DetectSystem:
-    counter = 0
     is_detected = False
 
     @staticmethod
@@ -38,14 +37,17 @@ configSystem.read()
 m10Lidar.connect()
 plotLidar.init()
 
+debouncer = Debouncer()
+
+
+def cb():
+    plotLidar.update_cloud_points(m10Lidar.xs, m10Lidar.ys)
+    plotLidar.plot_boundary(configSystem.boundary_points)
+    plotLidar.plot_calibration_point(configSystem.calibration_point)
+    if detectSystem.is_one_detected(m10Lidar.points, configSystem.boundary_points):
+        print("detected")
+
+
 while True:
     m10Lidar.listen()
-
-    detectSystem.counter += 1
-    if detectSystem.counter > 100:
-        detectSystem.counter = 0
-        plotLidar.update_cloud_points(m10Lidar.xs, m10Lidar.ys)
-        plotLidar.plot_boundary(configSystem.boundary_points)
-        plotLidar.plot_calibration_point(configSystem.calibration_point)
-        if detectSystem.is_one_detected(m10Lidar.points, configSystem.boundary_points):
-            print("detected")
+    debouncer.auto_counter(cb)

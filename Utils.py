@@ -286,8 +286,8 @@ class PlotLidar:
             self.plot_app = curr_os.plot_app
             self.plot_win = pg.GraphicsLayoutWidget(show=True, title="M10 Lidar Real-time Plot")
             self.plot_plt = self.plot_win.addPlot(title="M10 Lidar Real-time Plot")
-            self.plot_plt.setXRange(-11000, 11000)
-            self.plot_plt.setYRange(-11000, 11000)
+            self.plot_plt.setXRange(-8000, 8000)
+            self.plot_plt.setYRange(-8000, 8000)
 
             self.scatter_dynamic = self.plot_plt.scatterPlot(size=3, pen=pg.mkPen(color='r', width=1), symbol='o')
             self.scatter_center = self.plot_plt.scatterPlot(size=6, pen=pg.mkPen(color='g', width=6), symbol='o')

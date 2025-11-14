@@ -26,26 +26,7 @@ CONFIG = {
 # with open("polygon.json", 'r') as json_file:
 #     polygon = json.load(json_file)
 #
-# xs = []
-# ys = []
-# for point in polygon:
-#     xs.append(point[0])
-#     ys.append(point[1])
-#
-#
-# class OSS_ENUM(Enum):
-#     WINDOWS = 0,
-#     LINUX = 1
-#
-#
-# class Relay:
-#     def on(self):
-#         pass
-#
-#     def off(self):
-#         pass
-#
-#
+
 class OSWindows:
     plot_app = QApplication([]) if CONFIG["PLOTTING"] else None
     ser_m10 = serial.Serial("COM25", 460800, timeout=1)
@@ -256,6 +237,17 @@ class OSLinux:
 curr_os = OSWindows()
 
 
+class Utils:
+    @staticmethod
+    def point_to_xs_ys(points):
+        xs = []
+        ys = []
+        for point in points:
+            xs.append(point[0])
+            ys.append(point[1])
+        return xs, ys
+
+
 class Debouncer:
     prev_time = time.time()
 
@@ -392,21 +384,13 @@ class PlotLidar:
     plot_app = None
     plot_win = None
     plot_plt = None
+
+    scatter_calibrate = None
     scatter_dynamic = None
     scatter_center = None
     scatter_range = None
 
-    debouncer = Debouncer()
     counter = 0
-
-    @staticmethod
-    def __point_to_xs_ys(points):
-        xs = []
-        ys = []
-        for point in points:
-            xs.append(point[0])
-            ys.append(point[1])
-        return xs, ys
 
     def init(self):
         if CONFIG["PLOTTING"]:
@@ -417,10 +401,12 @@ class PlotLidar:
             self.plot_plt.setYRange(-11000, 11000)
 
             self.scatter_dynamic = self.plot_plt.scatterPlot(size=3, pen=pg.mkPen(color='r', width=1), symbol='o')
-            self.scatter_center = self.plot_plt.scatterPlot(size=10, pen=pg.mkPen(color='y', width=3), symbol='o')
-            self.scatter_range = self.plot_plt.plot(pen=pg.mkPen(color='g', width=1))
-
+            self.scatter_center = self.plot_plt.scatterPlot(size=6, pen=pg.mkPen(color='g', width=6), symbol='o')
+            self.scatter_range = [self.plot_plt.plot(pen=pg.mkPen(color='y', width=2)),
+                                  self.plot_plt.scatterPlot(size=3, pen=pg.mkPen(color='y', width=2))]
+            self.scatter_calibrate = self.plot_plt.scatterPlot(size=6, pen=pg.mkPen(color='y', width=6), symbol='x')
             self.scatter_center.setData(x=[0], y=[0])
+            self.scatter_calibrate.setData(x=[-6000], y=[500])
             # self.scatter_range.setData(x=xs, y=ys)
             # self.scatter_range = self.plot_plt.scatterPlot(size=3, pen=pg.mkPen(color='g', width=1), symbol='o')
             # self.scatter_range.setData(x=xs, y=ys)
@@ -439,8 +425,10 @@ class PlotLidar:
             print(e)
 
     def plot_boundary(self, boundary_points):
-        xs, ys = self.__point_to_xs_ys(boundary_points)
-        self.scatter_range.setData(x=xs, y=ys)
+        if CONFIG["PLOTTING"]:
+            xs, ys = Utils.point_to_xs_ys(boundary_points)
+            for sr in self.scatter_range:
+                sr.setData(x=xs, y=ys)
 
 # m10Lidar = M10Lidar()
 # plotLidar = PlotLidar()

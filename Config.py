@@ -8,15 +8,17 @@ with open("Config.json", 'r') as json_file:
 boundary_points = (
     (config["TOP_LEFT_POINT"]["x"], config["TOP_LEFT_POINT"]["y"]),
     (config["TOP_RIGHT_POINT"]["x"], config["TOP_RIGHT_POINT"]["y"]),
+    (config["BOTTOM_RIGHT_POINT"]["x"], config["BOTTOM_RIGHT_POINT"]["y"]),
     (config["BOTTOM_LEFT_POINT"]["x"], config["BOTTOM_LEFT_POINT"]["y"]),
-    (config["BOTTOM_RIGHT_POINT"]["x"], config["BOTTOM_RIGHT_POINT"]["y"])
+    (config["TOP_LEFT_POINT"]["x"], config["TOP_LEFT_POINT"]["y"]),
 )
+
+calibration_point = (config["CALIBRATION_POINT"]["x"], config["CALIBRATION_POINT"]["y"]),
 
 m10Lidar = M10Lidar()
 plotLidar = PlotLidar()
 m10Lidar.connect()
 plotLidar.init()
-
 
 while True:
     m10Lidar.listen()

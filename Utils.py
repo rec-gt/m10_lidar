@@ -406,7 +406,6 @@ class PlotLidar:
                                   self.plot_plt.scatterPlot(size=3, pen=pg.mkPen(color='y', width=2))]
             self.scatter_calibrate = self.plot_plt.scatterPlot(size=6, pen=pg.mkPen(color='y', width=6), symbol='x')
             self.scatter_center.setData(x=[0], y=[0])
-            self.scatter_calibrate.setData(x=[-6000], y=[500])
             # self.scatter_range.setData(x=xs, y=ys)
             # self.scatter_range = self.plot_plt.scatterPlot(size=3, pen=pg.mkPen(color='g', width=1), symbol='o')
             # self.scatter_range.setData(x=xs, y=ys)
@@ -429,6 +428,12 @@ class PlotLidar:
             xs, ys = Utils.point_to_xs_ys(boundary_points)
             for sr in self.scatter_range:
                 sr.setData(x=xs, y=ys)
+
+    def plot_calibration_point(self, calibration_point):
+        x = calibration_point[0]
+        y = calibration_point[1]
+        if CONFIG["PLOTTING"]:
+            self.scatter_calibrate.setData(x=[x], y=[y])
 
 # m10Lidar = M10Lidar()
 # plotLidar = PlotLidar()

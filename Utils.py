@@ -303,4 +303,4 @@ class ModbusRTUServer:
 
     def update_ir(self, address, values):
         if self.store:
-            self.store.setValues(4, address, values)
+            self.store.setValues(4, address, values)  # input registers

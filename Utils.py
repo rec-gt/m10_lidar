@@ -303,7 +303,7 @@ class ModbusRTUServer:
 
     def update_hr(self, address, value):
         if self.store:
-            self.store.setValues(3, 0, [2573, 123])
+            self.store.setValues(3, 0, [0, 123, 456])
 
 
 class RS485Client:

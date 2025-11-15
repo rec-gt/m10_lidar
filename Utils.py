@@ -31,13 +31,13 @@ class OSConfig(Enum):
 class OSWindows:
     plot_app = QApplication([]) if CONFIG["PLOTTING"] else None
     ser_m10 = serial.Serial("COM25", 460800, timeout=1)
-    # ser_mcu = serial.Serial("COM22", 9600, timeout=1)
+    modbus_rtu_port = "COM22"
 
 
 class OSLinux:
     plot_app = pg.mkQApp("") if CONFIG["PLOTTING"] else None
     ser_m10 = serial.Serial("/dev/ttyACM0", 460800, timeout=1) if CONFIG["OS"] == OSConfig.LINUX.name else None
-    # ser_mcu = serial.Serial("/dev/ttyS0", 9600, timeout=1) if CONFIG["OS"] == OSConfig.LINUX.name else None
+    modbus_rtu_port = "/dev/ttyS0"
 
 
 curr_os = OSWindows()
@@ -285,7 +285,7 @@ class ModbusRTUServer:
             StartSerialServer(
                 context=self.context,
                 identity=self.identity,
-                port='COM22',
+                port=curr_os.modbus_rtu_port,
                 baudrate=9600,
                 bytesize=8,
                 parity='N',
@@ -304,23 +304,3 @@ class ModbusRTUServer:
     def update_ir(self, address, values):
         if self.store:
             self.store.setValues(4, address, values)
-
-
-class RS485Client:
-    ser_mcu = None
-
-    def connect(self):
-        if self.ser_mcu and self.ser_mcu.is_open:
-            self.ser_mcu.close()
-            self.ser_mcu = None
-
-        if self.ser_mcu:
-            self.ser_mcu.close()
-            self.ser_mcu = None
-
-        self.ser_mcu = curr_os.ser_mcu
-        if not self.ser_mcu.is_open:
-            self.ser_mcu.open()
-
-    def send(self):
-        self.ser_mcu.write(bytes(b'AT+STATUS=' + bytes("01000000", 'utf-8') + b'\r\n'))

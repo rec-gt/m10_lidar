@@ -1,4 +1,4 @@
-from Utils import ConfigSystem, M10Lidar, PlotLidar, Utils, Debouncer, RS485Client, ModbusRTUServer
+from Utils import ConfigSystem, M10Lidar, PlotLidar, Debouncer, ModbusRTUServer
 
 
 class DetectSystem:

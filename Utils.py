@@ -263,6 +263,7 @@ class ModbusRTUServer:
     server_thread = None
 
     identity = None
+    store = None
     context = None
 
     def init(self):
@@ -273,11 +274,11 @@ class ModbusRTUServer:
 
     def loop(self):
         while True:
-            store = ModbusDeviceContext(
+            self.store = ModbusDeviceContext(
                 hr=ModbusSequentialDataBlock(0, [17] * 100),  # start from 40000
             )
 
-            self.context = ModbusServerContext(devices=store, single=True)
+            self.context = ModbusServerContext(devices=self.store, single=True)
 
             print("Starting Modbus RTU Server on COM port...")
 
@@ -301,9 +302,8 @@ class ModbusRTUServer:
             print("[Main] Server already running.")
 
     def update_hr(self, address, value):
-        if self.context:
-            with self.context[0].hr_lock:
-                self.context[0].setValues(3, 0, [2573])  # 0.01°C
+        if self.store:
+            self.store.setValues(3, 0, [2573, 123])
 
 
 class RS485Client:

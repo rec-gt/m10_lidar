@@ -301,9 +301,9 @@ class ModbusRTUServer:
         else:
             print("[Main] Server already running.")
 
-    def update_hr(self, address, value):
+    def update_hr(self, func_code, address, values):
         if self.store:
-            self.store.setValues(3, 0, [0, 123, 456])
+            self.store.setValues(3, 0, [23, 123, 456])
 
 
 class RS485Client:

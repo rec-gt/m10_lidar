@@ -56,7 +56,7 @@ import random
 
 def cb2():
     if detectSystem.is_detected:
-        modbusRTUServer.update_hr(0, random.randint(100, 999))
+        modbusRTUServer.update_hr(3, 0, [random.randint(100, 999), random.randint(100, 999), random.randint(100, 999)])
 
 
 modbusRTUServer.start_server_thread()

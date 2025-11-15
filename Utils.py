@@ -10,29 +10,23 @@ from PyQt5.QtWidgets import QApplication
 
 import threading
 
+from dotenv import load_dotenv
 from pymodbus import ModbusDeviceIdentification
 from pymodbus.datastore import ModbusSequentialDataBlock, ModbusDeviceContext, ModbusServerContext
 from pymodbus.server import StartSerialServer
+
+load_dotenv()
+
+CONFIG = {
+    "OS": os.getenv('OSS'),
+    "PLOTTING": os.getenv('PLOTTING') == 'True',
+}
 
 
 class OSConfig(Enum):
     WINDOWS = 0,
     LINUX = 1
 
-
-CONFIG = {
-    "OS": os.getenv('OSS'),
-    "PLOTTING": True,
-    # "PLOTTING": os.getenv('PLOTTING') == 'True',
-}
-
-
-# load_dotenv()
-#
-#
-# with open("polygon.json", 'r') as json_file:
-#     polygon = json.load(json_file)
-#
 
 class OSWindows:
     plot_app = QApplication([]) if CONFIG["PLOTTING"] else None
@@ -44,72 +38,6 @@ class OSLinux:
     plot_app = pg.mkQApp("") if CONFIG["PLOTTING"] else None
     ser_m10 = serial.Serial("/dev/ttyACM0", 460800, timeout=1) if CONFIG["OS"] == OSConfig.LINUX.name else None
     # ser_mcu = serial.Serial("/dev/ttyS0", 9600, timeout=1) if CONFIG["OS"] == OSConfig.LINUX.name else None
-
-
-#
-# class Service:
-#     curr_os = OSWindows()
-#
-#     ser_m10 = None
-#     ser_mcu = None
-#
-#     def inbound_detect(self):
-#         length = len(self.sin_values)
-#         for i in range(length):
-#             x = self.sin_values[i]
-#             y = self.cos_values[i]
-#
-#             if self.is_point_in_polygon(x, y, polygon):
-#                 print(x, y)
-#                 return True
-#
-#         return False
-#
-#     def is_point_in_polygon(self, x, y, polygon):
-#         n = len(polygon)
-#         inside = False
-#
-#         px, py = x, y
-#         for i in range(n):
-#             x1, y1 = polygon[i]
-#             x2, y2 = polygon[(i + 1) % n]
-#
-#             # Check if the point is within the y-range of the edge
-#             if min(y1, y2) < py <= max(y1, y2):
-#                 # Calculate the x-coordinate where the ray intersects the edge
-#                 x_intersect = x1 + (py - y1) * (x2 - x1) / (y2 - y1)
-#                 if px < x_intersect:  # The ray crosses the edge
-#                     inside = not inside
-#
-#         return inside
-#
-#     def handle_comm_mcu(self):
-#         currTime = time.time()
-#         if currTime - self.prevTime > 2:
-#             string = "1"
-#             self.prevTime = currTime
-#
-#             string += "1" if self.inbound_detect() else "0"
-#             self.ser_mcu.write(bytes(b'AT+STATUS=' + bytes(string, 'utf-8') + b'\r\n'))
-#
-#     def print_data(self, speed, start_angle, distances, last_angle):
-#         if last_angle - start_angle > 100:
-#             print("*******************************")
-#
-#         print("转速:", speed, end="\t")
-#         print("起始角度:", start_angle, end="\t")
-#         print("数据【距离（mm）】*42个点：", end="\t")
-#
-#         for distance in distances:
-#             print(distance, end="\t")
-#         print("\n")
-#
-#
-# service = Service()
-# service.curr_os = OSWindows() if CONFIG["OS"] == OSS_ENUM.WINDOWS.name else OSLinux()
-# service.init_relay()
-# service.init_plot()
-# service.conn()
 
 
 curr_os = OSWindows()

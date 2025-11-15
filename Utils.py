@@ -263,6 +263,7 @@ class ModbusRTUServer:
     server_thread = None
 
     identity = None
+    context = None
 
     def init(self):
         self.identity = ModbusDeviceIdentification()
@@ -275,10 +276,13 @@ class ModbusRTUServer:
             store = ModbusDeviceContext(
                 hr=ModbusSequentialDataBlock(0, [17] * 100),  # start from 40000
             )
-            context = ModbusServerContext(devices=store, single=True)
+
+            self.context = ModbusServerContext(devices=store, single=True)
+
             print("Starting Modbus RTU Server on COM port...")
+
             StartSerialServer(
-                context=context,
+                context=self.context,
                 identity=self.identity,
                 port='COM22',
                 baudrate=9600,
@@ -295,6 +299,11 @@ class ModbusRTUServer:
             print("[Main] Server thread started.")
         else:
             print("[Main] Server already running.")
+
+    def update_hr(self, address, value):
+        if self.context:
+            with self.context[0].hr_lock:
+                self.context[0].setValues(3, 0, [2573])  # 0.01°C
 
 
 class RS485Client:

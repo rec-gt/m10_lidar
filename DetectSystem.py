@@ -39,7 +39,6 @@ configSystem.read()
 m10Lidar.connect()
 plotLidar.init()
 modbusRTUServer.init()
-modbusRTUServer.start_server_thread()
 
 debouncer = Debouncer()
 
@@ -52,7 +51,17 @@ def cb():
         print("detected")
 
 
+import random
+
+
+def cb2():
+    if detectSystem.is_detected:
+        modbusRTUServer.update_hr(0, random.randint(100, 999))
+        pass
+
+
+modbusRTUServer.start_server_thread()
 while True:
     m10Lidar.listen()
     debouncer.auto_counter(100, cb)
-    # debouncer.auto_timeout(1, cb2)
+    debouncer.auto_timeout(1, cb2)

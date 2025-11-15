@@ -8,6 +8,12 @@ import pyqtgraph as pg
 import serial
 from PyQt5.QtWidgets import QApplication
 
+import threading
+
+from pymodbus import ModbusDeviceIdentification
+from pymodbus.datastore import ModbusSequentialDataBlock, ModbusDeviceContext, ModbusServerContext
+from pymodbus.server import StartSerialServer
+
 
 class OSConfig(Enum):
     WINDOWS = 0,
@@ -31,13 +37,13 @@ CONFIG = {
 class OSWindows:
     plot_app = QApplication([]) if CONFIG["PLOTTING"] else None
     ser_m10 = serial.Serial("COM25", 460800, timeout=1)
-    ser_mcu = serial.Serial("COM22", 9600, timeout=1)
+    # ser_mcu = serial.Serial("COM22", 9600, timeout=1)
 
 
 class OSLinux:
     plot_app = pg.mkQApp("") if CONFIG["PLOTTING"] else None
     ser_m10 = serial.Serial("/dev/ttyACM0", 460800, timeout=1) if CONFIG["OS"] == OSConfig.LINUX.name else None
-    ser_mcu = serial.Serial("/dev/ttyS0", 9600, timeout=1) if CONFIG["OS"] == OSConfig.LINUX.name else None
+    # ser_mcu = serial.Serial("/dev/ttyS0", 9600, timeout=1) if CONFIG["OS"] == OSConfig.LINUX.name else None
 
 
 #
@@ -325,9 +331,42 @@ class PlotLidar:
             self.scatter_calibrate.setData(x=[x], y=[y])
 
 
-class ModbusServer:
-    def listen(self):
-        pass
+class ModbusRTUServer:
+    server_thread = None
+
+    identity = None
+
+    def init(self):
+        self.identity = ModbusDeviceIdentification()
+        self.identity.VendorName = 'RGT'
+        self.identity.ProductCode = 'RGT-LIDAR'
+        self.identity.ProductName = 'RGT-LIDAR'
+
+    def loop(self):
+        while True:
+            store = ModbusDeviceContext(
+                hr=ModbusSequentialDataBlock(0, [17] * 100),  # start from 40000
+            )
+            context = ModbusServerContext(devices=store, single=True)
+            print("Starting Modbus RTU Server on COM port...")
+            StartSerialServer(
+                context=context,
+                identity=self.identity,
+                port='COM22',
+                baudrate=9600,
+                bytesize=8,
+                parity='N',
+                stopbits=1,
+                timeout=1,
+            )
+
+    def start_server_thread(self):
+        if self.server_thread is None or not self.server_thread.is_alive():
+            self.server_thread = threading.Thread(target=self.loop, daemon=True)
+            self.server_thread.start()
+            print("[Main] Server thread started.")
+        else:
+            print("[Main] Server already running.")
 
 
 class RS485Client:

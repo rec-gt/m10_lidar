@@ -1,4 +1,4 @@
-from Utils import ConfigSystem, M10Lidar, PlotLidar, Utils, Debouncer, RS485Client
+from Utils import ConfigSystem, M10Lidar, PlotLidar, Utils, Debouncer, RS485Client, ModbusRTUServer
 
 
 class DetectSystem:
@@ -31,14 +31,15 @@ class DetectSystem:
 
 configSystem = ConfigSystem()
 detectSystem = DetectSystem()
-rs485Client = RS485Client()
 m10Lidar = M10Lidar()
 plotLidar = PlotLidar()
+modbusRTUServer = ModbusRTUServer()
 
 configSystem.read()
 m10Lidar.connect()
 plotLidar.init()
-rs485Client.connect()
+modbusRTUServer.init()
+modbusRTUServer.start_server_thread()
 
 debouncer = Debouncer()
 
@@ -51,11 +52,7 @@ def cb():
         print("detected")
 
 
-def cb2():
-    rs485Client.send()
-
-
 while True:
     m10Lidar.listen()
     debouncer.auto_counter(100, cb)
-    debouncer.auto_timeout(1, cb2)
+    # debouncer.auto_timeout(1, cb2)

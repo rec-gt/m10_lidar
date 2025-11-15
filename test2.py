@@ -11,10 +11,10 @@ class ModbusRTUServer:
     identity = None
 
     def init(self):
-        identity = ModbusDeviceIdentification()
-        identity.VendorName = 'RGT'
-        identity.ProductCode = 'RGT-LIDAR'
-        identity.ProductName = 'RGT-LIDAR'
+        self.identity = ModbusDeviceIdentification()
+        self.identity.VendorName = 'RGT'
+        self.identity.ProductCode = 'RGT-LIDAR'
+        self.identity.ProductName = 'RGT-LIDAR'
 
     def loop(self):
         while True:

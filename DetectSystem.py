@@ -47,8 +47,7 @@ def cb():
     plotLidar.update_cloud_points(m10Lidar.xs, m10Lidar.ys)
     plotLidar.plot_boundary(configSystem.boundary_points)
     plotLidar.plot_calibration_point(configSystem.calibration_point)
-    if detectSystem.is_one_detected(m10Lidar.points, configSystem.boundary_points):
-        print("detected")
+    detectSystem.is_one_detected(m10Lidar.points, configSystem.boundary_points)
 
 
 import random
@@ -56,7 +55,9 @@ import random
 
 def cb2():
     if detectSystem.is_detected:
-        modbusRTUServer.update_ir(0, [random.randint(100, 999), random.randint(100, 999), random.randint(100, 999)])
+        modbusRTUServer.update_ir(0, [random.randint(100, 999), 1, random.randint(100, 999)])
+    else:
+        modbusRTUServer.update_ir(0, [random.randint(100, 999), 0, random.randint(100, 999)])
 
 
 modbusRTUServer.start_server_thread()

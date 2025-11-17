@@ -305,8 +305,8 @@ class ModbusRTUServer:
                 parity='N',
                 stopbits=1,
                 timeout=1,
-                framer=FramerType.RTU,
-                trace_packet=trace_packet
+                # framer=FramerType.RTU,
+                # trace_packet=trace_packet
             )
 
     def start_server_thread(self):

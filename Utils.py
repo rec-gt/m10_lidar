@@ -286,7 +286,7 @@ class ModbusRTUServer:
                 context=self.context,
                 identity=self.identity,
                 port=curr_os.modbus_rtu_port,
-                baudrate=9600,
+                baudrate=4800,
                 bytesize=8,
                 parity='N',
                 stopbits=1,

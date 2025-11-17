@@ -11,8 +11,9 @@ from PyQt5.QtWidgets import QApplication
 import threading
 
 from dotenv import load_dotenv
-from pymodbus import ModbusDeviceIdentification
+from pymodbus import ModbusDeviceIdentification, FramerType
 from pymodbus.datastore import ModbusSequentialDataBlock, ModbusDeviceContext, ModbusServerContext
+from pymodbus.framer import FramerRTU
 from pymodbus.server import StartSerialServer
 
 load_dotenv()
@@ -266,6 +267,8 @@ class ModbusRTUServer:
     store = None
     context = None
 
+    # my_framer = FramerRTU()
+
     def init(self):
         self.identity = ModbusDeviceIdentification()
         self.identity.VendorName = 'RGT'
@@ -282,15 +285,28 @@ class ModbusRTUServer:
 
             print("Starting Modbus RTU Server on COM port...")
 
+            def trace_packet(is_request: bool, packet: bytes) -> bytes:
+                direction = ">> TX (Request)" if is_request else "<< RX (Response)"
+                # print(f"{direction}: {str(int(packet, 16))}")
+                print(f"{direction}: {list(map(int, packet))}")
+                return packet  # Return unchanged
+
+            def trace_pdu(is_request: bool, packet: bytes) -> bytes:
+                direction = ">> TX (Request)" if is_request else "<< RX (Response)"
+                print(f"{direction}: {packet}")
+                return packet  # Return unchanged
+
             StartSerialServer(
                 context=self.context,
                 identity=self.identity,
                 port=curr_os.modbus_rtu_port,
-                baudrate=4800,
+                baudrate=1200,
                 bytesize=8,
                 parity='N',
                 stopbits=1,
                 timeout=1,
+                framer=FramerType.RTU,
+                trace_packet=trace_packet
             )
 
     def start_server_thread(self):

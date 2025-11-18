@@ -23,19 +23,6 @@ CONFIG = None
 with open("Config.json", 'r') as json_file:
     CONFIG = json.load(json_file)
 
-
-class OSWindows:
-    plot_app = QApplication([]) if CONFIG["PLOTTING"] else None
-    ser_m10 = serial.Serial("COM25", 460800, timeout=1)
-    modbus_rtu_port = "COM22"
-
-
-class OSLinux:
-    plot_app = pg.mkQApp("") if CONFIG["PLOTTING"] else None
-    ser_m10 = serial.Serial("/dev/ttyACM0", 460800, timeout=1) if CONFIG["OS"]["LINUX"]["NAME"] == os_name else None
-    modbus_rtu_port = "/dev/ttyS0" if CONFIG["OS"]["LINUX"]["NAME"] == os_name else None
-
-
 class OSConfig:
     plot_app = None
     if CONFIG["PLOTTING"]:
@@ -58,7 +45,6 @@ class OSConfig:
 
 
 curr_os = OSConfig()
-
 
 class Utils:
     @staticmethod

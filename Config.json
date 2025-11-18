@@ -32,8 +32,8 @@
     "LINUX": {
       "NAME": "LINUX",
       "PORTS": {
-        "NBIOT": "ttyACM0",
-        "LIDAR": "ttyACM1"
+        "NBIOT": "/dev/ttyACM0",
+        "LIDAR": "/dev/ttyACM1"
       }
     }
   },

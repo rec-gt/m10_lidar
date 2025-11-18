@@ -23,28 +23,33 @@ CONFIG = None
 with open("Config.json", 'r') as json_file:
     CONFIG = json.load(json_file)
 
+
 class OSConfig:
+    OS_LINUX = CONFIG["OS"]["LINUX"]
+    OS_WINDOWS = CONFIG["OS"]["WINDOWS"]
+
     plot_app = None
     if CONFIG["PLOTTING"]:
-        if CONFIG["OS"]["LINUX"]["NAME"] == os_name:
+        if OS_LINUX["NAME"] == os_name:
             plot_app = pg.mkQApp("")
-        if CONFIG["OS"]["WINDOWS"]["NAME"] == os_name:
+        if OS_WINDOWS["NAME"] == os_name:
             plot_app = QApplication([])
 
     ser_m10 = None
-    if CONFIG["OS"]["LINUX"]["NAME"] == os_name:
-        ser_m10 = serial.Serial(CONFIG["OS"]["LINUX"]["PORTS"]["NBIOT"], 460800, timeout=1)
-    if CONFIG["OS"]["WINDOWS"]["NAME"] == os_name:
-        ser_m10 = serial.Serial(CONFIG["OS"]["WINDOWS"]["PORTS"]["NBIOT"], 460800, timeout=1)
+    if OS_LINUX["NAME"] == os_name:
+        ser_m10 = serial.Serial(OS_LINUX["PORTS"]["NBIOT"], 460800, timeout=1)
+    if OS_WINDOWS["NAME"] == os_name:
+        ser_m10 = serial.Serial(OS_WINDOWS["PORTS"]["NBIOT"], 460800, timeout=1)
 
     modbus_rtu_port = None
-    if CONFIG["OS"]["LINUX"]["NAME"] == os_name:
-        modbus_rtu_port = CONFIG["OS"]["LINUX"]["PORTS"]["LIDAR"]
-    if CONFIG["OS"]["WINDOWS"]["NAME"] == os_name:
-        modbus_rtu_port = CONFIG["OS"]["WINDOWS"]["PORTS"]["LIDAR"]
+    if OS_LINUX["NAME"] == os_name:
+        modbus_rtu_port = OS_LINUX["PORTS"]["LIDAR"]
+    if OS_WINDOWS["NAME"] == os_name:
+        modbus_rtu_port = OS_WINDOWS["PORTS"]["LIDAR"]
 
 
 curr_os = OSConfig()
+
 
 class Utils:
     @staticmethod
@@ -62,18 +67,18 @@ class ConfigSystem:
     calibration_point = ()
 
     def read(self):
-        with open("Config.json", 'r') as json_file:
-            config = json.load(json_file)
+        CONFIG_POINTS = CONFIG["POINTS"]
 
         self.boundary_points = (
-            (config["POINTS"]["TOP_LEFT_POINT"]["x"], config["POINTS"]["TOP_LEFT_POINT"]["y"]),
-            (config["POINTS"]["TOP_RIGHT_POINT"]["x"], config["POINTS"]["TOP_RIGHT_POINT"]["y"]),
-            (config["POINTS"]["BOTTOM_RIGHT_POINT"]["x"], config["POINTS"]["BOTTOM_RIGHT_POINT"]["y"]),
-            (config["POINTS"]["BOTTOM_LEFT_POINT"]["x"], config["POINTS"]["BOTTOM_LEFT_POINT"]["y"]),
-            (config["POINTS"]["TOP_LEFT_POINT"]["x"], config["POINTS"]["TOP_LEFT_POINT"]["y"]),
+            (CONFIG_POINTS["TOP_LEFT_POINT"]["x"], CONFIG_POINTS["TOP_LEFT_POINT"]["y"]),
+            (CONFIG_POINTS["TOP_RIGHT_POINT"]["x"], CONFIG_POINTS["TOP_RIGHT_POINT"]["y"]),
+            (CONFIG_POINTS["BOTTOM_RIGHT_POINT"]["x"], CONFIG_POINTS["BOTTOM_RIGHT_POINT"]["y"]),
+            (CONFIG_POINTS["BOTTOM_LEFT_POINT"]["x"], CONFIG_POINTS["BOTTOM_LEFT_POINT"]["y"]),
+            (CONFIG_POINTS["TOP_LEFT_POINT"]["x"], CONFIG_POINTS["TOP_LEFT_POINT"]["y"]),
         )
 
-        self.calibration_point = (config["POINTS"]["CALIBRATION_POINT"]["x"], config["POINTS"]["CALIBRATION_POINT"]["y"])
+        self.calibration_point = (
+            CONFIG_POINTS["CALIBRATION_POINT"]["x"], CONFIG_POINTS["CALIBRATION_POINT"]["y"])
 
 
 class Debouncer:

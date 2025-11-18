@@ -11,20 +11,17 @@ from PyQt5.QtWidgets import QApplication
 import threading
 
 from dotenv import load_dotenv
+from pymodbus import ModbusDeviceIdentification
 from pymodbus.datastore import ModbusSequentialDataBlock, ModbusDeviceContext, ModbusServerContext
 from pymodbus.server import StartSerialServer
 
-load_dotenv()
+import platform
 
-CONFIG = {
-    "OS": os.getenv('OSS'),
-    "PLOTTING": os.getenv('PLOTTING') == 'True',
-}
+os_name = platform.system().upper()
 
-
-class OSConfig(Enum):
-    WINDOWS = 0,
-    LINUX = 1
+CONFIG = None
+with open("Config.json", 'r') as json_file:
+    CONFIG = json.load(json_file)
 
 
 class OSWindows:
@@ -35,11 +32,32 @@ class OSWindows:
 
 class OSLinux:
     plot_app = pg.mkQApp("") if CONFIG["PLOTTING"] else None
-    ser_m10 = serial.Serial("/dev/ttyACM0", 460800, timeout=1) if CONFIG["OS"] == OSConfig.LINUX.name else None
-    modbus_rtu_port = "/dev/ttyS0"
+    ser_m10 = serial.Serial("/dev/ttyACM0", 460800, timeout=1) if CONFIG["OS"]["LINUX"]["NAME"] == os_name else None
+    modbus_rtu_port = "/dev/ttyS0" if CONFIG["OS"]["LINUX"]["NAME"] == os_name else None
 
 
-curr_os = OSWindows()
+class OSConfig:
+    plot_app = None
+    if CONFIG["PLOTTING"]:
+        if CONFIG["OS"]["LINUX"]["NAME"] == os_name:
+            plot_app = pg.mkQApp("")
+        if CONFIG["OS"]["WINDOWS"]["NAME"] == os_name:
+            plot_app = QApplication([])
+
+    ser_m10 = None
+    if CONFIG["OS"]["LINUX"]["NAME"] == os_name:
+        ser_m10 = serial.Serial("COM25", 460800, timeout=1)
+    if CONFIG["OS"]["WINDOWS"]["NAME"] == os_name:
+        ser_m10 = serial.Serial("/dev/ttyACM0", 460800, timeout=1)
+
+    modbus_rtu_port = None
+    if CONFIG["OS"]["LINUX"]["NAME"] == os_name:
+        modbus_rtu_port = "COM22"
+    if CONFIG["OS"]["WINDOWS"]["NAME"] == os_name:
+        modbus_rtu_port = "/dev/ttyACM1"
+
+
+curr_os = OSConfig()
 
 
 class Utils:
@@ -268,7 +286,10 @@ class ModbusRTUServer:
     # my_framer = FramerRTU()
 
     def init(self):
-        pass
+        self.identity = ModbusDeviceIdentification()
+        self.identity.VendorName = 'RGT'
+        self.identity.ProductCode = 'RGT-LIDAR'
+        self.identity.ProductName = 'RGT-LIDAR'
 
     def loop(self):
         while True:

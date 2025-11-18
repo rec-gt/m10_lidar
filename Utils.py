@@ -1,16 +1,12 @@
 import json
 import math
-import os
 import time
-from enum import Enum
-
 import pyqtgraph as pg
 import serial
 from PyQt5.QtWidgets import QApplication
 
 import threading
 
-from dotenv import load_dotenv
 from pymodbus import ModbusDeviceIdentification
 from pymodbus.datastore import ModbusSequentialDataBlock, ModbusDeviceContext, ModbusServerContext
 from pymodbus.server import StartSerialServer

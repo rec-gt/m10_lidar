@@ -11,9 +11,7 @@ from PyQt5.QtWidgets import QApplication
 import threading
 
 from dotenv import load_dotenv
-from pymodbus import ModbusDeviceIdentification, FramerType
 from pymodbus.datastore import ModbusSequentialDataBlock, ModbusDeviceContext, ModbusServerContext
-from pymodbus.framer import FramerRTU
 from pymodbus.server import StartSerialServer
 
 load_dotenv()
@@ -270,10 +268,7 @@ class ModbusRTUServer:
     # my_framer = FramerRTU()
 
     def init(self):
-        self.identity = ModbusDeviceIdentification()
-        self.identity.VendorName = 'RGT'
-        self.identity.ProductCode = 'RGT-LIDAR'
-        self.identity.ProductName = 'RGT-LIDAR'
+        pass
 
     def loop(self):
         while True:

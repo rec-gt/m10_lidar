@@ -46,15 +46,15 @@ class OSConfig:
 
     ser_m10 = None
     if CONFIG["OS"]["LINUX"]["NAME"] == os_name:
-        ser_m10 = serial.Serial("COM25", 460800, timeout=1)
-    if CONFIG["OS"]["WINDOWS"]["NAME"] == os_name:
         ser_m10 = serial.Serial("/dev/ttyACM0", 460800, timeout=1)
+    if CONFIG["OS"]["WINDOWS"]["NAME"] == os_name:
+        ser_m10 = serial.Serial("COM25", 460800, timeout=1)
 
     modbus_rtu_port = None
     if CONFIG["OS"]["LINUX"]["NAME"] == os_name:
-        modbus_rtu_port = "COM22"
-    if CONFIG["OS"]["WINDOWS"]["NAME"] == os_name:
         modbus_rtu_port = "/dev/ttyACM1"
+    if CONFIG["OS"]["WINDOWS"]["NAME"] == os_name:
+        modbus_rtu_port = "COM22"
 
 
 curr_os = OSConfig()

@@ -46,15 +46,15 @@ class OSConfig:
 
     ser_m10 = None
     if CONFIG["OS"]["LINUX"]["NAME"] == os_name:
-        ser_m10 = serial.Serial("/dev/ttyACM0", 460800, timeout=1)
+        ser_m10 = serial.Serial(CONFIG["OS"]["LINUX"]["PORTS"]["NBIOT"], 460800, timeout=1)
     if CONFIG["OS"]["WINDOWS"]["NAME"] == os_name:
-        ser_m10 = serial.Serial("COM25", 460800, timeout=1)
+        ser_m10 = serial.Serial(CONFIG["OS"]["WINDOWS"]["PORTS"]["NBIOT"], 460800, timeout=1)
 
     modbus_rtu_port = None
     if CONFIG["OS"]["LINUX"]["NAME"] == os_name:
-        modbus_rtu_port = "/dev/ttyACM1"
+        modbus_rtu_port = CONFIG["OS"]["LINUX"]["PORTS"]["LIDAR"]
     if CONFIG["OS"]["WINDOWS"]["NAME"] == os_name:
-        modbus_rtu_port = "COM22"
+        modbus_rtu_port = CONFIG["OS"]["WINDOWS"]["PORTS"]["LIDAR"]
 
 
 curr_os = OSConfig()
@@ -80,14 +80,14 @@ class ConfigSystem:
             config = json.load(json_file)
 
         self.boundary_points = (
-            (config["TOP_LEFT_POINT"]["x"], config["TOP_LEFT_POINT"]["y"]),
-            (config["TOP_RIGHT_POINT"]["x"], config["TOP_RIGHT_POINT"]["y"]),
-            (config["BOTTOM_RIGHT_POINT"]["x"], config["BOTTOM_RIGHT_POINT"]["y"]),
-            (config["BOTTOM_LEFT_POINT"]["x"], config["BOTTOM_LEFT_POINT"]["y"]),
-            (config["TOP_LEFT_POINT"]["x"], config["TOP_LEFT_POINT"]["y"]),
+            (config["POINTS"]["TOP_LEFT_POINT"]["x"], config["POINTS"]["TOP_LEFT_POINT"]["y"]),
+            (config["POINTS"]["TOP_RIGHT_POINT"]["x"], config["POINTS"]["TOP_RIGHT_POINT"]["y"]),
+            (config["POINTS"]["BOTTOM_RIGHT_POINT"]["x"], config["POINTS"]["BOTTOM_RIGHT_POINT"]["y"]),
+            (config["POINTS"]["BOTTOM_LEFT_POINT"]["x"], config["POINTS"]["BOTTOM_LEFT_POINT"]["y"]),
+            (config["POINTS"]["TOP_LEFT_POINT"]["x"], config["POINTS"]["TOP_LEFT_POINT"]["y"]),
         )
 
-        self.calibration_point = (config["CALIBRATION_POINT"]["x"], config["CALIBRATION_POINT"]["y"])
+        self.calibration_point = (config["POINTS"]["CALIBRATION_POINT"]["x"], config["POINTS"]["CALIBRATION_POINT"]["y"])
 
 
 class Debouncer:

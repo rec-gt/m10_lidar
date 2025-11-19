@@ -58,10 +58,10 @@ import random
 
 
 def cb2():
-    if detectSystem.is_detected:
-        modbusRTUServer.update_ir(0, [random.randint(100, 999), 1, random.randint(100, 999)])
-    else:
-        modbusRTUServer.update_ir(0, [random.randint(100, 999), 0, random.randint(100, 999)])
+    lidar_err = 1 if m10Lidar.curr_err > 0 else 0
+    inbound_detection = 1 if detectSystem.is_detected else 0
+
+    modbusRTUServer.update_ir(0, [lidar_err, inbound_detection])
 
 
 modbusRTUServer.start_server_thread()

@@ -42,23 +42,18 @@ plotLidar.init()
 
 
 def cb():
-    (
-        plotLidar
-        .plot_cloud_points(m10Lidar.xs, m10Lidar.ys)
-        .plot_boundary(configSystem.boundary_points)
-        .plot_calibration_point(configSystem.calibration_point)
-    )
-
-
-def cb2():
     profileSetter.set_profile_coordinates(m10Lidar.points)
-    plotLidar.plot_boundary(profileSetter.polygon)
+
+    (
+        plotLidar.
+        plot_cloud_points(m10Lidar.xs, m10Lidar.ys).
+        plot_boundary(profileSetter.polygon)
+    )
 
 
 while True:
     m10Lidar.listen()
     debouncer1.auto_counter(100, cb)
-    debouncer2.auto_counter(100, cb2)
 
 # import math
 # import time

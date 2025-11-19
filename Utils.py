@@ -68,8 +68,6 @@ class ConfigSystem:
     calibration_point = ()
 
     def read(self):
-        CONFIG_POINTS = CONFIG["POINTS"]
-
         self.boundary_points = (
             (CONFIG_POINTS["TOP_LEFT_POINT"]["x"], CONFIG_POINTS["TOP_LEFT_POINT"]["y"]),
             (CONFIG_POINTS["TOP_RIGHT_POINT"]["x"], CONFIG_POINTS["TOP_RIGHT_POINT"]["y"]),

@@ -12,7 +12,7 @@ debouncer = Debouncer()
 
 
 def cb():
-    plotLidar.update_cloud_points(m10Lidar.xs, m10Lidar.ys)
+    plotLidar.plot_cloud_points(m10Lidar.xs, m10Lidar.ys)
     plotLidar.plot_boundary(configSystem.boundary_points)
     plotLidar.plot_calibration_point(configSystem.calibration_point)
 

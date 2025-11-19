@@ -244,23 +244,26 @@ class PlotLidar:
             # self.scatter_range = self.plot_plt.scatterPlot(size=3, pen=pg.mkPen(color='g', width=1), symbol='o')
             # self.scatter_range.setData(x=xs, y=ys)
 
-    def update_cloud_points(self, xs, ys):
+    def plot_cloud_points(self, xs, ys):
         if CONFIG["PLOTTING"]:
             self.scatter_dynamic.setData(x=xs, y=ys)
             self.plot_app.processEvents()
             time.sleep(0.05)
+        return self
 
     def plot_boundary(self, boundary_points):
         if CONFIG["PLOTTING"]:
             xs, ys = Utils.point_to_xs_ys(boundary_points)
             for sr in self.scatter_range:
                 sr.setData(x=xs, y=ys)
+        return self
 
     def plot_calibration_point(self, calibration_point):
         x = calibration_point[0]
         y = calibration_point[1]
         if CONFIG["PLOTTING"]:
             self.scatter_calibrate.setData(x=[x], y=[y])
+        return self
 
 
 class ModbusRTUServer:

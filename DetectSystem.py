@@ -54,9 +54,6 @@ def cb():
     detectSystem.is_one_detected(m10Lidar.points, configSystem.boundary_points)
 
 
-import random
-
-
 def cb2():
     lidar_err = 1 if m10Lidar.curr_err > 0 else 0
     inbound_detection = 1 if detectSystem.is_detected else 0

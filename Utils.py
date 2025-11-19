@@ -15,17 +15,22 @@ import platform
 
 os_name = platform.system().upper()
 
-CONFIG = None
-with open("Config.json", 'r') as json_file:
-    CONFIG = json.load(json_file)
+CONFIG_SYSTEM = None
+CONFIG_POINTS = None
+
+with open("Config_System.json", 'r') as f:
+    CONFIG_SYSTEM = json.load(f)
+
+with open("Config_Points.json", 'r') as f:
+    CONFIG_POINTS = json.load(f)
 
 
 class OSConfig:
-    OS_LINUX = CONFIG["OS"]["LINUX"]
-    OS_WINDOWS = CONFIG["OS"]["WINDOWS"]
+    OS_LINUX = CONFIG_SYSTEM["OS"]["LINUX"]
+    OS_WINDOWS = CONFIG_SYSTEM["OS"]["WINDOWS"]
 
     plot_app = None
-    if CONFIG["PLOTTING"]:
+    if CONFIG_SYSTEM["PLOTTING"]:
         if OS_LINUX["NAME"] == os_name:
             plot_app = pg.mkQApp("")
         if OS_WINDOWS["NAME"] == os_name:
@@ -227,7 +232,7 @@ class PlotLidar:
     scatter_range = None
 
     def init(self):
-        if CONFIG["PLOTTING"]:
+        if CONFIG_SYSTEM["PLOTTING"]:
             self.plot_app = curr_os.plot_app
             self.plot_win = pg.GraphicsLayoutWidget(show=True, title="M10 Lidar Real-time Plot")
             self.plot_plt = self.plot_win.addPlot(title="M10 Lidar Real-time Plot")
@@ -245,14 +250,14 @@ class PlotLidar:
             # self.scatter_range.setData(x=xs, y=ys)
 
     def plot_cloud_points(self, xs, ys):
-        if CONFIG["PLOTTING"]:
+        if CONFIG_SYSTEM["PLOTTING"]:
             self.scatter_dynamic.setData(x=xs, y=ys)
             self.plot_app.processEvents()
             time.sleep(0.05)
         return self
 
     def plot_boundary(self, boundary_points):
-        if CONFIG["PLOTTING"]:
+        if CONFIG_SYSTEM["PLOTTING"]:
             xs, ys = Utils.point_to_xs_ys(boundary_points)
             for sr in self.scatter_range:
                 sr.setData(x=xs, y=ys)
@@ -261,7 +266,7 @@ class PlotLidar:
     def plot_calibration_point(self, calibration_point):
         x = calibration_point[0]
         y = calibration_point[1]
-        if CONFIG["PLOTTING"]:
+        if CONFIG_SYSTEM["PLOTTING"]:
             self.scatter_calibrate.setData(x=[x], y=[y])
         return self
 

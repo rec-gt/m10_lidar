@@ -1,5 +1,3 @@
-import json
-
 from Main import SystemConfig, M10Lidar, PlotLidar, Debouncer, ModbusRTUServer
 
 

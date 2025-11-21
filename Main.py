@@ -25,8 +25,11 @@ with open("Config_System.json", 'r') as f:
 with open("Config_Points.json", 'r') as f:
     CONFIG_POINTS = json.load(f)
 
-with open("Config_Polygon.json", 'r') as f:
-    CONFIG_POLYGON = json.load(f)
+try:
+    with open("Config_Polygon.json", 'r') as f:
+        CONFIG_POLYGON = json.load(f)
+except Exception:
+    CONFIG_POLYGON = []
 
 
 ### === Configuration === ###

@@ -9,7 +9,7 @@ class InBoundChecker:
 
     @staticmethod
     def __is_inside_boundary(self, point, boundary):
-        self.is_inbound = False
+        is_inbound = False
 
         n = len(boundary)
         px, py = point
@@ -20,20 +20,30 @@ class InBoundChecker:
             if min(y1, y2) < py <= max(y1, y2):
                 x_intersect = x1 + (py - y1) * (x2 - x1) / (y2 - y1)
                 if px < x_intersect:
-                    self.is_inbound = not self.is_inbound
+                    is_inbound = not is_inbound
 
+        self.is_inbound = is_inbound
         return self.is_inbound
 
     def debounce_check(self, point, boundary):
+
+        self.__is_inside_boundary(point, boundary)
+
         if self.is_inbound:
             self.consecutive_count += 1
+        else:
+            self.consecutive_count = 0
+
+        return self.consecutive_count > 50
 
 
 class DetectSystem:
-    is_detected = False
+    points = []
     boundary = []
 
-    inBoundChecker = InBoundChecker()
+    is_inbound = False
+    consecutive_count = 0
+    is_detected = False
 
     @staticmethod
     def __is_inside_boundary(point, boundary):
@@ -52,15 +62,32 @@ class DetectSystem:
 
         return inside
 
+    def set_points(self, points):
+        self.points = points
+
     def set_boundary(self, boundary):
         self.boundary = boundary
 
-    def is_one_detected(self, points):
-        self.is_detected = False
-        for point in points:
+    def listen(self):
+        self.is_inbound = False
+        for point in self.points:
             if self.__is_inside_boundary(point, self.boundary):
-                self.is_detected = True
-        return self.is_detected
+                self.is_inbound = True
+
+        if self.is_inbound:
+            self.consecutive_count += 1
+        else:
+            self.consecutive_count = 0
+
+        self.is_detected = self.consecutive_count > 50
+
+    # def debounce_check(self):
+    #     if self.is_inbound:
+    #         self.consecutive_count += 1
+    #     else:
+    #         self.consecutive_count = 0
+    #
+    #     self.is_detected = self.consecutive_count > 50
 
 
 systemConfig = SystemConfig()
@@ -87,7 +114,8 @@ def cb():
         .plot_calibration_point(systemConfig.calibration_point)
     )
 
-    detectSystem.is_one_detected(m10Lidar.points)
+    detectSystem.set_points(m10Lidar.points)
+    detectSystem.listen()
 
 
 def cb2():

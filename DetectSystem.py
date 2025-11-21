@@ -1,4 +1,5 @@
-from Main import SystemConfig, M10Lidar, PlotLidar, Debouncer, ModbusRTUServer
+from Main import SystemConfig, M10Lidar, PlotLidar, ModbusRTUServer
+from Utils import Debouncer
 
 
 class DetectSystem:

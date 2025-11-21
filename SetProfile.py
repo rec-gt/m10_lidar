@@ -1,6 +1,7 @@
 import json
 
-from Main import SystemConfig, M10Lidar, Debouncer, PlotLidar
+from Main import SystemConfig, M10Lidar, PlotLidar
+from Utils import Debouncer
 
 
 class ProfileSetter:

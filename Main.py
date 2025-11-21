@@ -59,12 +59,14 @@ class OSConfig:
 
 class SystemConfig:
     boundary_points = (())
+    calibration_point = ()
     polygon_points = (())
     boundary_profile = "DEFAULT"
     boundary = (())
 
     def __init__(self):
         self.boundary_points = (())
+        self.calibration_point = ()
         self.polygon_points = (())
         self.boundary_profile = "DEFAULT"
         self.boundary = (())
@@ -76,8 +78,10 @@ class SystemConfig:
             (CONFIG_POINTS["BOTTOM_RIGHT_POINT"]["x"], CONFIG_POINTS["BOTTOM_RIGHT_POINT"]["y"]),
             (CONFIG_POINTS["BOTTOM_LEFT_POINT"]["x"], CONFIG_POINTS["BOTTOM_LEFT_POINT"]["y"]),
             (CONFIG_POINTS["TOP_LEFT_POINT"]["x"], CONFIG_POINTS["TOP_LEFT_POINT"]["y"]),
-            (CONFIG_POINTS["CALIBRATION_POINT"]["x"], CONFIG_POINTS["CALIBRATION_POINT"]["y"])
         )
+
+        self.calibration_point = (
+            CONFIG_POINTS["CALIBRATION_POINT"]["x"], CONFIG_POINTS["CALIBRATION_POINT"]["y"])
 
         self.polygon_points = CONFIG_POLYGON
 

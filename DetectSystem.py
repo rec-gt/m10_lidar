@@ -55,6 +55,7 @@ def cb():
         plotLidar
         .plot_cloud_points(m10Lidar.xs, m10Lidar.ys)
         .plot_boundary(detectSystem.boundary)
+        .plot_calibration_point(systemConfig.calibration_point)
     )
 
     detectSystem.is_one_detected(m10Lidar.points)

@@ -2,9 +2,38 @@ from Main import SystemConfig, M10Lidar, PlotLidar, ModbusRTUServer
 from Utils import Debouncer
 
 
+class InBoundChecker:
+    boundary = (())
+    is_inbound = False
+    consecutive_count = 0
+
+    @staticmethod
+    def __is_inside_boundary(self, point, boundary):
+        self.is_inbound = False
+
+        n = len(boundary)
+        px, py = point
+        for i in range(n):
+            x1, y1 = boundary[i]
+            x2, y2 = boundary[(i + 1) % n]
+
+            if min(y1, y2) < py <= max(y1, y2):
+                x_intersect = x1 + (py - y1) * (x2 - x1) / (y2 - y1)
+                if px < x_intersect:
+                    self.is_inbound = not self.is_inbound
+
+        return self.is_inbound
+
+    def debounce_check(self, point, boundary):
+        if self.is_inbound:
+            self.consecutive_count += 1
+
+
 class DetectSystem:
     is_detected = False
     boundary = []
+
+    inBoundChecker = InBoundChecker()
 
     @staticmethod
     def __is_inside_boundary(point, boundary):

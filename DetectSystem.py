@@ -48,8 +48,7 @@ modbusRTUServer.init()
 
 debouncer = Debouncer()
 
-detectSystem.set_boundary(
-    systemConfig.boundary_points if systemConfig.boundary_profile == "DEFAULT" else systemConfig.polygon_points)
+detectSystem.set_boundary(systemConfig.boundary)
 
 
 def cb():

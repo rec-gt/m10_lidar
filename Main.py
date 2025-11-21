@@ -62,12 +62,14 @@ class SystemConfig:
     calibration_point = ()
     polygon_points = (())
     boundary_profile = "DEFAULT"
+    boundary = (())
 
     def __init__(self):
         self.boundary_points = (())
         self.calibration_point = ()
         self.polygon_points = (())
         self.boundary_profile = "DEFAULT"
+        self.boundary = (())
 
     def read(self):
         self.boundary_points = (
@@ -81,9 +83,14 @@ class SystemConfig:
         self.calibration_point = (
             CONFIG_POINTS["CALIBRATION_POINT"]["x"], CONFIG_POINTS["CALIBRATION_POINT"]["y"])
 
-        self.polygon_point = CONFIG_POLYGON
+        self.polygon_points = CONFIG_POLYGON
 
         self.boundary_profile = CONFIG_SYSTEM["BOUNDARY_PROFILE"]
+
+        if self.boundary_profile == "DEFAULT":
+            self.boundary = self.boundary_points
+        else:
+            self.boundary = self.polygon_points
 
 
 ### === System Core === ###

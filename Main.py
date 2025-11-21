@@ -66,7 +66,7 @@ class SystemConfig:
     def __init__(self):
         self.boundary_points = (())
         self.calibration_point = ()
-        self.polygon_point = (())
+        self.polygon_points = (())
         self.boundary_profile = "DEFAULT"
 
     def read(self):

@@ -1,6 +1,6 @@
 import json
 
-from Utils import ConfigSystem, M10Lidar, PlotLidar, Debouncer, ModbusRTUServer
+from Main import SystemConfig, M10Lidar, PlotLidar, Debouncer, ModbusRTUServer
 
 
 class DetectSystem:
@@ -35,41 +35,29 @@ class DetectSystem:
         return self.is_detected
 
 
-configSystem = ConfigSystem()
+systemConfig = SystemConfig()
 detectSystem = DetectSystem()
 m10Lidar = M10Lidar()
 plotLidar = PlotLidar()
 modbusRTUServer = ModbusRTUServer()
 
-configSystem.read()
+systemConfig.read()
 m10Lidar.connect()
 plotLidar.init()
 modbusRTUServer.init()
 
 debouncer = Debouncer()
 
-with open("Config_Polygon.json", 'r') as f:
-    boundary_polygon = json.load(f)
-
-boundary_default = configSystem.boundary_points
-
-detectSystem.set_boundary(boundary_default if configSystem.boundary_profile == "DEFAULT" else boundary_polygon)
+detectSystem.set_boundary(
+    systemConfig.boundary_points if systemConfig.boundary_profile == "DEFAULT" else systemConfig.polygon_points)
 
 
 def cb():
-    if configSystem.boundary_profile == "DEFAULT":
-        (
-            plotLidar
-            .plot_cloud_points(m10Lidar.xs, m10Lidar.ys)
-            .plot_boundary(configSystem.boundary_points)
-            .plot_calibration_point(configSystem.calibration_point)
-        )
-    else:
-        (
-            plotLidar
-            .plot_cloud_points(m10Lidar.xs, m10Lidar.ys)
-            .plot_boundary(boundary_polygon)
-        )
+    (
+        plotLidar
+        .plot_cloud_points(m10Lidar.xs, m10Lidar.ys)
+        .plot_boundary(detectSystem.boundary)
+    )
 
     detectSystem.is_one_detected(m10Lidar.points)
 

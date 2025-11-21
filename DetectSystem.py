@@ -44,15 +44,7 @@ class DetectSystem:
         else:
             self.consecutive_count = 0
 
-        self.is_detected = self.consecutive_count > 50
-
-    # def debounce_check(self):
-    #     if self.is_inbound:
-    #         self.consecutive_count += 1
-    #     else:
-    #         self.consecutive_count = 0
-    #
-    #     self.is_detected = self.consecutive_count > 50
+        self.is_detected = self.consecutive_count > 5
 
 
 systemConfig = SystemConfig()

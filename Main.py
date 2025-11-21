@@ -93,6 +93,9 @@ class SystemConfig:
             self.boundary = self.polygon_points
 
 
+curr_os = OSConfig()
+
+
 ### === System Core === ###
 
 class Debouncer:
@@ -342,6 +345,3 @@ class ModbusRTUServer:
     def update_ir(self, address, values):
         if self.store:
             self.store.setValues(4, address, values)  # input registers
-
-
-curr_os = OSConfig()

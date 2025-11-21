@@ -88,7 +88,7 @@ class SystemConfig:
         self.boundary_profile = CONFIG_SYSTEM["BOUNDARY_PROFILE"]
 
         if self.boundary_profile == "DEFAULT":
-            self.boundary = self.boundary_points
+            self.boundary = self.boundary_points + self.calibration_point
         else:
             self.boundary = self.polygon_points
 

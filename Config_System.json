@@ -15,5 +15,6 @@
       }
     }
   },
-  "PLOTTING": true
+  "PLOTTING": true,
+  "BOUNDARY_PROFILE": "DEFAULT"
 }

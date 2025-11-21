@@ -24,7 +24,7 @@ class ProfileSetter:
     def set_profile_coordinates(self, coordinates):
         self.polygon = self.shrink_coordinates(coordinates, 50)
 
-        with open("Polygon.json", 'w') as f:
+        with open("Config_Polygon.json", 'w') as f:
             json.dump(self.polygon, f, indent=4)
         print("Updated polygon profile")
 

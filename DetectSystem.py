@@ -1,8 +1,11 @@
+import json
+
 from Utils import ConfigSystem, M10Lidar, PlotLidar, Debouncer, ModbusRTUServer
 
 
 class DetectSystem:
     is_detected = False
+    boundary = []
 
     @staticmethod
     def __is_inside_boundary(point, boundary):
@@ -21,10 +24,13 @@ class DetectSystem:
 
         return inside
 
-    def is_one_detected(self, points, boundary):
+    def set_boundary(self, boundary):
+        self.boundary = boundary
+
+    def is_one_detected(self, points):
         self.is_detected = False
         for point in points:
-            if self.__is_inside_boundary(point, boundary):
+            if self.__is_inside_boundary(point, self.boundary):
                 self.is_detected = True
         return self.is_detected
 
@@ -42,16 +48,30 @@ modbusRTUServer.init()
 
 debouncer = Debouncer()
 
+with open("Config_Polygon.json", 'r') as f:
+    boundary_polygon = json.load(f)
+
+boundary_default = configSystem.boundary_points
+
+detectSystem.set_boundary(boundary_default if configSystem.boundary_profile == "DEFAULT" else boundary_polygon)
+
 
 def cb():
-    (
-        plotLidar
-        .plot_cloud_points(m10Lidar.xs, m10Lidar.ys)
-        .plot_boundary(configSystem.boundary_points)
-        .plot_calibration_point(configSystem.calibration_point)
-    )
+    if configSystem.boundary_profile == "DEFAULT":
+        (
+            plotLidar
+            .plot_cloud_points(m10Lidar.xs, m10Lidar.ys)
+            .plot_boundary(configSystem.boundary_points)
+            .plot_calibration_point(configSystem.calibration_point)
+        )
+    else:
+        (
+            plotLidar
+            .plot_cloud_points(m10Lidar.xs, m10Lidar.ys)
+            .plot_boundary(boundary_polygon)
+        )
 
-    detectSystem.is_one_detected(m10Lidar.points, configSystem.boundary_points)
+    detectSystem.is_one_detected(m10Lidar.points)
 
 
 def cb2():

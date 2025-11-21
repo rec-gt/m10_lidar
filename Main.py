@@ -13,6 +13,8 @@ from pymodbus.server import StartSerialServer
 
 import platform
 
+from Utils import Utils
+
 CONFIG_SYSTEM = None
 CONFIG_POINTS = None
 CONFIG_POLYGON = None
@@ -26,6 +28,8 @@ with open("Config_Points.json", 'r') as f:
 with open("Config_Polygon.json", 'r') as f:
     CONFIG_POLYGON = json.load(f)
 
+
+### === Configuration === ###
 
 class OSConfig:
     __os_name = platform.system().upper()
@@ -53,29 +57,19 @@ class OSConfig:
         modbus_rtu_port = __OS_WINDOWS["PORTS"]["LIDAR"]
 
 
-curr_os = OSConfig()
-
-
-class Utils:
-    @staticmethod
-    def point_to_xs_ys(points):
-        xs = []
-        ys = []
-        for point in points:
-            xs.append(point[0])
-            ys.append(point[1])
-        return xs, ys
-
-
-class ConfigSystem:
+class SystemConfig:
     boundary_points = (())
     calibration_point = ()
+    polygon_points = (())
     boundary_profile = "DEFAULT"
 
-    def read(self):
-        global CONFIG_POINTS
-        CONFIG_POINTS = CONFIG_POINTS["POINTS"]
+    def __init__(self):
+        self.boundary_points = (())
+        self.calibration_point = ()
+        self.polygon_point = (())
+        self.boundary_profile = "DEFAULT"
 
+    def read(self):
         self.boundary_points = (
             (CONFIG_POINTS["TOP_LEFT_POINT"]["x"], CONFIG_POINTS["TOP_LEFT_POINT"]["y"]),
             (CONFIG_POINTS["TOP_RIGHT_POINT"]["x"], CONFIG_POINTS["TOP_RIGHT_POINT"]["y"]),
@@ -87,8 +81,12 @@ class ConfigSystem:
         self.calibration_point = (
             CONFIG_POINTS["CALIBRATION_POINT"]["x"], CONFIG_POINTS["CALIBRATION_POINT"]["y"])
 
+        self.polygon_point = CONFIG_POLYGON
+
         self.boundary_profile = CONFIG_SYSTEM["BOUNDARY_PROFILE"]
 
+
+### === System Core === ###
 
 class Debouncer:
     prev_time = time.time()
@@ -339,3 +337,6 @@ class ModbusRTUServer:
     def update_ir(self, address, values):
         if self.store:
             self.store.setValues(4, address, values)  # input registers
+
+
+curr_os = OSConfig()

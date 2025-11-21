@@ -70,6 +70,7 @@ def cb2():
 
 
 modbusRTUServer.start_server_thread()
+
 while True:
     m10Lidar.listen()
     debouncer.auto_counter(100, cb)

@@ -1,6 +1,6 @@
 import json
 
-from Utils import ConfigSystem, M10Lidar, Debouncer, PlotLidar
+from Main import SystemConfig, M10Lidar, Debouncer, PlotLidar
 
 
 class ProfileSetter:
@@ -29,7 +29,7 @@ class ProfileSetter:
         print("Updated polygon profile")
 
 
-configSystem = ConfigSystem()
+configSystem = SystemConfig()
 m10Lidar = M10Lidar()
 plotLidar = PlotLidar()
 profileSetter = ProfileSetter()

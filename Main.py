@@ -291,8 +291,6 @@ class ModbusRTUServer:
     store = None
     context = None
 
-    # my_framer = FramerRTU()
-
     def init(self):
         self.identity = ModbusDeviceIdentification()
         self.identity.VendorName = 'RGT'

@@ -1,6 +1,8 @@
 import json
 import math
 
+import numpy as np
+
 from Main import SystemConfig, M10Lidar, PlotLidar
 from Utils import Debouncer
 
@@ -48,12 +50,13 @@ class ProfileSetter2:
         centroid = [0, 0]
         new_points = []
         for point in points:
-            angle = math.atan2(point[1] - centroid[1], point[0] - centroid[0])
-            current_distance = math.sqrt((point[0] - centroid[0]) ** 2 + (point[1] - centroid[1]) ** 2)
-            new_distance = max(current_distance - shrink_amount, 0)  # 確保新距離為正值
-            new_x = centroid[0] + new_distance * math.cos(angle)
-            new_y = centroid[1] + new_distance * math.sin(angle)
-            new_points.append([new_x, new_y])
+            if point[0] is not None and point[1] is not None:
+                angle = math.atan2(point[1] - centroid[1], point[0] - centroid[0])
+                current_distance = math.sqrt((point[0] - centroid[0]) ** 2 + (point[1] - centroid[1]) ** 2)
+                new_distance = max(current_distance - shrink_amount, 0)  # 確保新距離為正值
+                new_x = centroid[0] + new_distance * math.cos(angle)
+                new_y = centroid[1] + new_distance * math.sin(angle)
+                new_points.append([new_x, new_y])
 
         return new_points
 
@@ -64,12 +67,28 @@ class ProfileSetter2:
             json.dump(self.polygon, f, indent=4)
         print("Updated polygon profile")
 
-    def record(self, coordinates):
+    def record(self, coordinates, sample_size=10):
         self.tmp_arr.append(coordinates)
-        if len(self.tmp_arr) > 10:
+        if len(self.tmp_arr) > sample_size:
             self.tmp_arr.pop(0)
-        flat_list = [item for sublist in self.tmp_arr for item in sublist]
-        self.records = flat_list
+
+        arr_2d = np.array(self.tmp_arr, dtype=object)
+        col_avgs = []
+        for col in range(arr_2d.shape[1]):
+            sum_tuple = (0, 0)
+            count = 0
+            for row in range(arr_2d.shape[0]):
+                current_tuple = arr_2d[row, col]
+                if current_tuple[0] is not None and current_tuple[1] is not None:
+                    sum_tuple = (sum_tuple[0] + current_tuple[0], sum_tuple[1] + current_tuple[1])
+                    count += 1
+            if count > 0:
+                avg_tuple = (sum_tuple[0] / count, sum_tuple[1] / count)
+            else:
+                avg_tuple = (None, None)
+
+            col_avgs.append(avg_tuple)
+        self.records = col_avgs
 
 
 systemConfig = SystemConfig()
@@ -85,8 +104,8 @@ plotLidar.init()
 
 
 def cb():
-    # profileSetter.record(m10Lidar.points)
-    # profileSetter.set_profile_coordinates(profileSetter.records)
+    profileSetter.record(m10Lidar.points, sample_size=20)
+    profileSetter.set_profile_coordinates(profileSetter.records)
     # profileSetter.set_profile_coordinates(m10Lidar.points)
 
     (

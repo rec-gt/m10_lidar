@@ -1,14 +1,14 @@
 {
   "TOP_LEFT_POINT": {
-    "x": -3000,
-    "y": 1000
+    "x": -6000,
+    "y": -850
   },
   "TOP_RIGHT_POINT": {
     "x": 0,
-    "y": 1000
+    "y": -850
   },
   "BOTTOM_LEFT_POINT": {
-    "x": -3000,
+    "x": -6000,
     "y": 0
   },
   "BOTTOM_RIGHT_POINT": {

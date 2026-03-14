@@ -50,14 +50,14 @@ class OSConfig:
             plot_app = QApplication([])
 
     if __os_name == __OS_LINUX["NAME"]:
-        ser_m10 = serial.Serial(__OS_LINUX["PORTS"]["NBIOT"], 460800, timeout=1)
+        ser_m10 = serial.Serial(__OS_LINUX["PORTS"]["LIDAR"], 460800, timeout=1)
     if __os_name == __OS_WINDOWS["NAME"]:
-        ser_m10 = serial.Serial(__OS_WINDOWS["PORTS"]["NBIOT"], 460800, timeout=1)
+        ser_m10 = serial.Serial(__OS_WINDOWS["PORTS"]["LIDAR"], 460800, timeout=1)
 
     if __os_name == __OS_LINUX["NAME"]:
-        modbus_rtu_port = __OS_LINUX["PORTS"]["LIDAR"]
+        modbus_rtu_port = __OS_LINUX["PORTS"]["IOT_CONTROLLER"]
     if __os_name == __OS_WINDOWS["NAME"]:
-        modbus_rtu_port = __OS_WINDOWS["PORTS"]["LIDAR"]
+        modbus_rtu_port = __OS_WINDOWS["PORTS"]["IOT_CONTROLLER"]
 
 
 class SystemConfig:
@@ -133,6 +133,8 @@ class M10Lidar:
     }
     xs = []
     ys = []
+    xs_clean = []
+    ys_clean = []
     points = []
 
     @staticmethod
@@ -156,8 +158,12 @@ class M10Lidar:
         for angle, distances in distance_cloud.items():
             delta_angle = 0
             for distance in distances:
+                # if distance is not None:
+                #     res.append([angle + delta_angle, distance])
                 if distance is not None:
                     res.append([angle + delta_angle, distance])
+                else:
+                    res.append([None, None])
                 delta_angle += 360 / 1008
         return res
 
@@ -166,11 +172,25 @@ class M10Lidar:
         _xs = []
         _ys = []
         for (angle, distance) in angle_distance_pairs:
-            radian = angle * math.pi / 180
-            sin_theta = math.sin(radian)
-            cos_theta = math.cos(radian)
-            _xs.append(distance * sin_theta)
-            _ys.append(distance * cos_theta)
+            if angle is None or distance is None:
+                _xs.append(None)
+                _ys.append(None)
+            else:
+                radian = angle * math.pi / 180
+                sin_theta = math.sin(radian)
+                cos_theta = math.cos(radian)
+                _xs.append(distance * sin_theta)
+                _ys.append(distance * cos_theta)
+        return _xs, _ys
+
+    @staticmethod
+    def __clean_coordinates(xs, ys):
+        _xs = []
+        _ys = []
+        for i in range(0, len(xs)):
+            if xs[i] is not None:
+                _xs.append(xs[i])
+                _ys.append(ys[i])
         return _xs, _ys
 
     @staticmethod
@@ -214,8 +234,36 @@ class M10Lidar:
                             data = self.ser_m10.read(88)
                             speed, start_angle, distances = self.__parse_data(data)
                             self.distance_cloud[start_angle] = distances
+
+                            # print(len(self.distance_cloud[8]))
+                            # print(len(self.distance_cloud[23]))
+                            # print(len(self.distance_cloud[38]))
+                            # print(len(self.distance_cloud[53]))
+                            # print(len(self.distance_cloud[68]))
+                            # print(len(self.distance_cloud[83]))
+                            # print(len(self.distance_cloud[98]))
+                            # print(len(self.distance_cloud[113]))
+                            # print(len(self.distance_cloud[128]))
+                            # print(len(self.distance_cloud[143]))
+                            # print(len(self.distance_cloud[158]))
+                            # print(len(self.distance_cloud[173]))
+                            # print(len(self.distance_cloud[188]))
+                            # print(len(self.distance_cloud[203]))
+                            # print(len(self.distance_cloud[218]))
+                            # print(len(self.distance_cloud[233]))
+                            # print(len(self.distance_cloud[248]))
+                            # print(len(self.distance_cloud[263]))
+                            # print(len(self.distance_cloud[278]))
+                            # print(len(self.distance_cloud[293]))
+                            # print(len(self.distance_cloud[308]))
+                            # print(len(self.distance_cloud[323]))
+                            # print(len(self.distance_cloud[338]))
+                            # print(len(self.distance_cloud[353]))
+
                             angle_distance_pairs = self.__parse_angle_distance_pairs(self.distance_cloud)
                             self.xs, self.ys = self.__transform_to_coordinates(angle_distance_pairs)
+                            self.xs_clean, self.ys_clean = self.__clean_coordinates(self.xs, self.ys)
+
                             self.points = self.__transform_to_points(self.xs, self.ys)
 
 

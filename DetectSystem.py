@@ -44,7 +44,7 @@ class DetectSystem:
         else:
             self.consecutive_count = 0
 
-        self.is_detected = self.consecutive_count > 5
+        self.is_detected = self.consecutive_count > 1
 
 
 systemConfig = SystemConfig()

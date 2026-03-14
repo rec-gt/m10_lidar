@@ -3,14 +3,14 @@
     "WINDOWS": {
       "NAME": "WINDOWS",
       "PORTS": {
-        "NBIOT": "COM25",
-        "LIDAR": "COM22"
+        "IOT_CONTROLLER": "COM1",
+        "LIDAR": "COM5"
       }
     },
     "LINUX": {
       "NAME": "LINUX",
       "PORTS": {
-        "NBIOT": "/dev/ttyACM0",
+        "IOT_CONTROLLER": "/dev/ttyACM0",
         "LIDAR": "/dev/ttyACM1"
       }
     }

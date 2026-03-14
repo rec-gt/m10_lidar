@@ -61,7 +61,7 @@ class ProfileSetter2:
         return new_points
 
     def set_profile_coordinates(self, coordinates):
-        self.polygon = self.shrink_coordinates(coordinates, 50)
+        self.polygon = self.shrink_coordinates(coordinates, 100)
 
         with open("Config_Polygon.json", 'w') as f:
             json.dump(self.polygon, f, indent=4)

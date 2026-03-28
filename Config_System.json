@@ -10,8 +10,8 @@
     "LINUX": {
       "NAME": "LINUX",
       "PORTS": {
-        "IOT_CONTROLLER": "/dev/ttyACM0",
-        "LIDAR": "/dev/ttyACM1"
+        "IOT_CONTROLLER": "/dev/ttyACM1",
+        "LIDAR": "/dev/ttyACM0"
       }
     }
   },

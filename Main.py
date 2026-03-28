@@ -136,6 +136,7 @@ class M10Lidar:
     xs_clean = []
     ys_clean = []
     points = []
+    points_clean = []
 
     @staticmethod
     def __parse_data(raw_data):
@@ -265,6 +266,7 @@ class M10Lidar:
                             self.xs_clean, self.ys_clean = self.__clean_coordinates(self.xs, self.ys)
 
                             self.points = self.__transform_to_points(self.xs, self.ys)
+                            self.points_clean = self.__transform_to_points(self.xs_clean, self.ys_clean)
 
 
             except Exception as e:

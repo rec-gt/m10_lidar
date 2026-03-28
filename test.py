@@ -1,98 +1,89 @@
-import numpy as np
+from Main import SystemConfig, M10Lidar, PlotLidar, ModbusRTUServer
+from Utils import Debouncer
 
 
-def weiszfeld(points, eps=1e-6, max_iter=200, initial_guess=None):
-    """
-    Compute approximate geometric median using Weiszfeld's algorithm.
+class DetectSystem:
+    points = []
+    boundary = []
 
-    Parameters:
-    -----------
-    points : ndarray (n_points, dim)
-        Input points (2D or higher)
-    eps : float
-        Convergence tolerance
-    max_iter : int
-        Maximum iterations
-    initial_guess : ndarray or None
-        Starting point (defaults to centroid)
+    is_inbound = False
+    consecutive_count = 0
+    is_detected = False
 
-    Returns:
-    --------
-    geometric_median : ndarray
-        Approximate geometric median
-    """
-    points = np.asarray(points)
-    if points.ndim != 2:
-        raise ValueError("points should be 2D array (n_points × dim)")
+    def __is_inside_boundary(self, point, boundary):
+        px, py = point
+        y_min = min(y for _, y in boundary)
+        y_max = max(y for _, y in boundary)
 
-    n, dim = points.shape
+        if py < y_min or py > y_max:
+            return False
 
-    # Good default start: centroid
-    if initial_guess is None:
-        y = np.mean(points, axis=0)
-    else:
-        y = np.asarray(initial_guess, dtype=float)
-        if y.shape != (dim,):
-            raise ValueError("initial_guess must have same dimension as points")
+        inside = False
+        n = len(boundary)
+        for i in range(n):
+            x1, y1 = boundary[i]
+            x2, y2 = boundary[(i + 1) % n]
 
-    for iteration in range(max_iter):
-        y_old = y.copy()
+            if min(y1, y2) < py <= max(y1, y2):
+                x_intersect = x1 + (py - y1) * (x2 - x1) / (y2 - y1)
+                if px < x_intersect:
+                    inside = not inside
 
-        # Distances to current estimate
-        distances = np.linalg.norm(points - y, axis=1)  # shape (n,)
+        return inside
 
-        # Avoid division by zero (very rare in float)
-        # Small epsilon safeguard + common practical fix
-        too_close = distances < 1e-10
-        if np.any(too_close):
-            # If y coincides with a point → that point is likely the median
-            if np.sum(too_close) == 1:
-                return points[np.argmax(too_close)]
-            # Otherwise continue with tiny epsilon
-            distances[too_close] = 1e-10
+    def set_points(self, points):
+        self.points = points
 
-        weights = 1.0 / distances  # shape (n,)
-        numerator = np.sum(points * weights[:, np.newaxis], axis=0)  # shape (dim,)
-        denominator = np.sum(weights)
+    def set_boundary(self, boundary):
+        self.boundary = boundary
 
-        y = numerator / denominator
+    def listen(self):
+        self.is_inbound = False
+        for point in self.points:
+            if self.__is_inside_boundary(point, self.boundary):
+                self.is_inbound = True
 
-        # Check convergence
-        if np.linalg.norm(y - y_old) < eps:
-            print(f"Converged after {iteration + 1} iterations")
-            return y
+        if self.is_inbound:
+            self.consecutive_count += 1
+        else:
+            self.consecutive_count = 0
 
-    print(f"Warning: Did not converge within {max_iter} iterations")
-    return y
+        self.is_detected = self.consecutive_count > 1
 
-import matplotlib.pyplot as plt
 
-# Example: noisy circle + one outlier
-np.random.seed(42)
-n = 60
-theta = np.linspace(0, 2*np.pi, n, endpoint=False)
-r = 1.0 + np.random.normal(0, 0.15, n)
-x = r * np.cos(theta) + 3
-y = r * np.sin(theta) + 4
+systemConfig = SystemConfig()
+detectSystem = DetectSystem()
+m10Lidar = M10Lidar()
+plotLidar = PlotLidar()
+modbusRTUServer = ModbusRTUServer()
 
-# Add one strong outlier
-x = np.append(x, 12)
-y = np.append(y, 1)
+systemConfig.read()
+m10Lidar.connect()
+plotLidar.init()
+modbusRTUServer.init()
 
-points = np.column_stack((x, y))
+debouncer = Debouncer()
 
-# Compute
-median_weisz = weiszfeld(points, eps=1e-7, max_iter=300)
+detectSystem.set_boundary(systemConfig.boundary)
 
-# Compare with centroid
-centroid = np.mean(points, axis=0)
 
-plt.figure(figsize=(9,7))
-plt.scatter(points[:,0], points[:,1], s=60, alpha=0.7, label='points')
-plt.scatter(centroid[0], centroid[1], c='C1', s=180, marker='*', label='centroid (arithmetic mean)')
-plt.scatter(median_weisz[0], median_weisz[1], c='C3', s=180, marker='X', label='geometric median (Weiszfeld)')
-plt.legend()
-plt.axis('equal')
-plt.title("Geometric Median vs Centroid\n(notice robustness to outlier)")
-plt.grid(alpha=0.3)
-plt.show()
+def cb():
+    (
+        plotLidar
+        .plot_cloud_points(m10Lidar.xs_clean, m10Lidar.ys_clean)
+        .plot_boundary(detectSystem.boundary)
+    )
+
+
+def cb2():
+    (
+        detectSystem.set_points([[1, 1]])
+        # detectSystem.set_points(m10Lidar.points_clean)
+    )
+
+
+while True:
+    m10Lidar.listen()
+    detectSystem.listen()
+    debouncer.auto_counter(100, cb)
+    debouncer.auto_counter(1000, cb2)

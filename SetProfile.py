@@ -5,6 +5,7 @@ import numpy as np
 
 from Main import SystemConfig, M10Lidar, PlotLidar
 from Utils import Debouncer
+import threading
 
 
 class ProfileSetter:
@@ -93,6 +94,15 @@ def cb():
     )
 
 
+def thd1():
+    while True:
+        m10Lidar.listen()
+
+
+thread1 = threading.Thread(target=thd1)
+
+thread1.start()
+
 while True:
-    m10Lidar.listen()
+    # m10Lidar.listen()
     debouncer1.auto_counter(100, cb)

@@ -9,40 +9,7 @@ from Utils import Debouncer
 
 class ProfileSetter:
     polygon = []
-    records = []
-
-    @staticmethod
-    def shrink_coordinates(points, shrink_amount=10):
-        for point in points:
-            if point[0] > 0:
-                point[0] -= shrink_amount
-            if point[0] < 0:
-                point[0] += shrink_amount
-
-            if point[1] > 0:
-                point[1] -= shrink_amount
-            if point[1] < 0:
-                point[1] += shrink_amount
-
-        return points
-
-    def set_profile_coordinates(self, coordinates):
-        self.polygon = self.shrink_coordinates(coordinates, 100)
-
-        with open("Config_Polygon.json", 'w') as f:
-            json.dump(self.polygon, f, indent=4)
-        print("Updated polygon profile")
-
-    def record(self, coordinates):
-        self.records.append(coordinates)
-        if len(self.records) > 10:
-            self.records.pop(0)
-        print(self.records)
-
-
-class ProfileSetter2:
-    polygon = []
-    tmp_arr = []
+    tmp_arr = [[None, None] for i in range(1008)]
     records = []
 
     @staticmethod
@@ -77,35 +44,33 @@ class ProfileSetter2:
         with open("Config_Polygon.json", 'w') as f:
             json.dump(self.polygon, f, indent=4)
         print("Updated polygon profile")
+        return self
 
-    def record(self, coordinates, sample_size=10):
-        self.tmp_arr.append(coordinates)
-        if len(self.tmp_arr) > sample_size:
-            self.tmp_arr.pop(0)
+    def record2(self, coordinates):
+        for i in range(len(coordinates)):
+            x, y = coordinates[i]
+            x_, y_ = self.tmp_arr[i]
 
-        arr_2d = np.array(self.tmp_arr, dtype=object)
-        col_avgs = []
-        for col in range(arr_2d.shape[1]):
-            sum_tuple = (0, 0)
-            count = 0
-            for row in range(arr_2d.shape[0]):
-                current_tuple = arr_2d[row, col]
-                if current_tuple[0] is not None and current_tuple[1] is not None:
-                    sum_tuple = (sum_tuple[0] + current_tuple[0], sum_tuple[1] + current_tuple[1])
-                    count += 1
-            if count > 0:
-                avg_tuple = (sum_tuple[0] / count, sum_tuple[1] / count)
-            else:
-                avg_tuple = (None, None)
+            if x_ is None or y_ is None:
+                self.tmp_arr[i] = coordinates[i]
+                continue
 
-            col_avgs.append(avg_tuple)
-        self.records = col_avgs
+            if x is None or y is None:
+                continue
+
+            distance = x ** 2 + y ** 2
+            prev_distance = x_ ** 2 + y_ ** 2
+            if distance < prev_distance:
+                self.tmp_arr[i] = coordinates[i]
+
+        self.records = self.tmp_arr
+        return self
 
 
 systemConfig = SystemConfig()
 m10Lidar = M10Lidar()
 plotLidar = PlotLidar()
-profileSetter = ProfileSetter2()
+profileSetter = ProfileSetter()
 debouncer1 = Debouncer()
 debouncer2 = Debouncer()
 
@@ -115,15 +80,16 @@ plotLidar.init()
 
 
 def cb():
-    profileSetter.record(m10Lidar.points, sample_size=1)
-    profileSetter.set_profile_coordinates(profileSetter.records)
-    # profileSetter.set_profile_coordinates(m10Lidar.points)
+    (
+        profileSetter.
+        record2(m10Lidar.points).
+        set_profile_coordinates(profileSetter.records)
+    )
 
     (
         plotLidar.
-        plot_cloud_points(m10Lidar.xs_clean, m10Lidar.ys_clean).
-        plot_boundary(profileSetter.polygon).
-        plot_calibration_point(systemConfig.calibration_point)
+        plot_cloud_points(m10Lidar.points_clean).
+        plot_boundary(profileSetter.polygon)
     )
 
 

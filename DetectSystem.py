@@ -12,7 +12,7 @@ class DetectSystem:
 
     @staticmethod
     def __is_inside_boundary(point, boundary):
-        if point[0] is None or  point[1] is None:
+        if point[0] is None or point[1] is None:
             return False
 
         inside = False
@@ -69,9 +69,8 @@ detectSystem.set_boundary(systemConfig.boundary)
 def cb():
     (
         plotLidar
-        .plot_cloud_points(m10Lidar.xs_clean, m10Lidar.ys_clean)
+        .plot_cloud_points(m10Lidar.points_clean)
         .plot_boundary(detectSystem.boundary)
-        .plot_calibration_point(systemConfig.calibration_point)
     )
 
     detectSystem.set_points(m10Lidar.points)
@@ -81,8 +80,8 @@ def cb():
 def cb2():
     lidar_err = 1 if m10Lidar.curr_err > 0 else 0
     inbound_detection = 1 if detectSystem.is_detected else 0
-    print(inbound_detection)
     modbusRTUServer.update_ir(0, [lidar_err, inbound_detection])
+    print(inbound_detection)
 
 
 modbusRTUServer.start_server_thread()

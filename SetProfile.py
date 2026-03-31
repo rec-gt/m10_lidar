@@ -1,11 +1,9 @@
 import json
 import math
-
-import numpy as np
+import threading
 
 from Main import SystemConfig, M10Lidar, PlotLidar
 from Utils import Debouncer
-import threading
 
 
 class ProfileSetter:
